@@ -36,7 +36,11 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
         EventGig eventGig = eventGigs.get(i);
-        viewHolder.name.setText(eventGig.getBand()+" "+eventGig.getDateTime());
+        viewHolder.name.setText(eventGig.getPlace() + " - " + eventGig.getName());
+        viewHolder.band.setText(eventGig.getBand());
+        viewHolder.date.setText(eventGig.getDate());
+        viewHolder.time.setText(eventGig.getTime());
+        viewHolder.price.setText(eventGig.getPrice());
     }
 
     @Override
@@ -47,10 +51,18 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView name;
+        private TextView band;
+        private TextView date;
+        private TextView time;
+        private TextView price;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            name = (TextView) itemView.findViewById(R.id.textView);
+            name = (TextView) itemView.findViewById(R.id.nameTxt);
+            band = (TextView) itemView.findViewById(R.id.bandsTxt);
+            date = (TextView) itemView.findViewById(R.id.dateTxt);
+            time = (TextView) itemView.findViewById(R.id.timeTxt);
+            price = (TextView) itemView.findViewById(R.id.priceTxt);
         }
     }
 }

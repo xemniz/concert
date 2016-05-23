@@ -8,4 +8,10 @@
     <string name="drawer_item_help">Help</string>
     <string name="drawer_item_open_source">Open Source</string>
     <string name="drawer_item_contact">Contact</string>
+    <string name="nameTxt">nameTxt</string>
+    <string name="dateAdapter">date</string>
+    <string name="nameAdapter">name</string>
+    <string name="bandsAdapter">bands</string>
+    <string name="timeAdapter">00:00</string>
+    <string name="priceAdapter">000</string>
 </resources>

@@ -28,8 +28,15 @@ public class RockGigApi {
         List<EventGig> gigsList = new ArrayList<>();
         Elements gigs = doc.getElementsByClass("ElDiv");
         for (Element gigEl : gigs){
-            EventGig gigData = new EventGig(gigEl.getElementsByClass("ElDivBand").get(0).text()
-                    , gigEl.getElementsByClass("ElDateM").get(0).text()+" "+gigEl.getElementsByClass("ElDateD").get(0).text());
+            EventGig gigData = new EventGig(
+                    gigEl.getElementsByClass("ElDivBand").get(0).text(),
+                    gigEl.getElementsByClass("ElDateM").get(0).text()+" "+gigEl.getElementsByClass("ElDateD").get(0).text(),
+                    gigEl.getElementsByClass("ElDivTime").get(0).text().substring(1,6),
+                    gigEl.getElementsByClass("ElDivName").get(0).select("span[itemprop = location]").select("span[itemprop = name]").text(),
+                    gigEl.getElementsByClass("ElDivName").get(0).select("span[class = elname]").select("span[itemprop = name]").text(),
+                    gigEl.getElementsByClass("ElDivTime").get(0).text().substring(9)
+                    );
+            System.out.println(gigData.toString());
             gigsList.add(gigData);
         }
         return gigsList;

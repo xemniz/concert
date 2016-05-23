@@ -4,12 +4,58 @@ package ru.xmn.concert.model.data;
  * Created by xmn on 19.05.2016.
  */
 public class EventGig {
-    String band;
-    String dateTime;
+    private String band;
+    private String date;
+    private String time;
+    private String place;
+    private String name;
+    private String price;
+
+    public EventGig(String band, String date, String time, String place, String name, String price) {
+        this.band = band;
+        this.date = date;
+        this.time = time;
+        this.place = place;
+        this.name = name;
+        this.price = price;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+
+    public String getPlace() {
+        return place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
 
     public EventGig(String band, String dateTime) {
         this.band = band;
-        this.dateTime = dateTime;
+        this.date = dateTime;
     }
 
     public String getBand() {
@@ -20,11 +66,23 @@ public class EventGig {
         this.band = band;
     }
 
-    public String getDateTime() {
-        return dateTime;
+    public String getDate() {
+        return date;
     }
 
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    @Override
+    public String toString() {
+        return "EventGig{" +
+                "band='" + band + '\'' +
+                ", date='" + date + '\'' +
+                ", time='" + time + '\'' +
+                ", place='" + place + '\'' +
+                ", name='" + name + '\'' +
+                ", price='" + price + '\'' +
+                '}';
     }
 }
