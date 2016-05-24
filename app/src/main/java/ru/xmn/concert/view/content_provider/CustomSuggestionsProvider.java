@@ -21,7 +21,7 @@ public class CustomSuggestionsProvider extends ContentProvider {
     private static final int GET_SAMPLE = 0;
     private static final int GET_CUSTOM_SUGGESTIONS = 1;
 
-    private static final String PROVIDER_NAME = "br.com.edsilfer.content_provider.CustomSuggestionsProvider";
+    private static final String PROVIDER_NAME = "ru.xmn.concert.view.content_provider.CustomSuggestionsProvider";
     private static final UriMatcher uriMatcher;
 
     static {

@@ -49,10 +49,10 @@ public class RockGigApi {
                 .get();
         List<String> bandsList = new ArrayList<>();
 
-        System.out.println(doc.getElementById("rsbList").text());
-        Elements bandsListJsoup = doc.getElementById("rsbList").getElementsByTag("a");
+        System.out.println(doc.getElementsByClass("SearchResult").get(0).text());
+        Elements bandsListJsoup = doc.getElementsByClass("ListBandName");
         for (Element bandEl : bandsListJsoup){
-            bandsList.add(bandEl.text());
+            bandsList.add(bandEl.getElementsByTag("a").text());
         }
         return bandsList;
     }

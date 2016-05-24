@@ -40,8 +40,10 @@ public class ConcertsModel {
                         }
                     }
                 })
+
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                ;
     }
 
 }

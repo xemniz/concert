@@ -25,6 +25,6 @@
             android:name=".view.content_provider.RecentSuggestionsProvider"
             android:authorities="ru.xmn.concert.view.content_provider.RecentSuggestionsProvider" />
         <provider android:name=".view.content_provider.CustomSuggestionsProvider"
-            android:authorities="br.com.edsilfer.content_provider.CustomSuggestionsProvider" />
+            android:authorities="ru.xmn.concert.view.content_provider.CustomSuggestionsProvider" />
     </application>
 </manifest>

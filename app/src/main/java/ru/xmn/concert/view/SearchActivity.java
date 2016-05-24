@@ -35,14 +35,7 @@ import br.com.customsearchable.model.ResultItem;
 import br.com.customsearchable.util.ManifestParser;
 import br.com.customsearchable.util.RecyclerViewOnItemClickListener;
 import ru.xmn.concert.R;
-import ru.xmn.concert.model.data.EventGig;
-import ru.xmn.concert.presenter.Presenter;
 import ru.xmn.concert.presenter.SearchPresenter;
-import rx.Observer;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.subscriptions.Subscriptions;
 
 /**
  * This activity controls the maint flow for the Custom Searchable behaviour. Its onCreate method
@@ -150,6 +143,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView{
             if (!CustomSearchableInfo.getIsTwoLineExhibition()) {
                 SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, providerAuthority, SearchRecentSuggestionsProvider.DATABASE_MODE_QUERIES);
                 suggestions.saveRecentQuery(query, null);
+                System.out.println(query);
             }
 
             startActivity(sendIntent);
@@ -164,6 +158,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView{
         // Gets the event of pressing search button on soft keyboard
         TextView.OnEditorActionListener searchListener = new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView exampleView, int actionId, KeyEvent event) {
+                System.out.println("onEditorAction");
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     sendSearchIntent();
                 }
@@ -179,9 +174,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView{
                 if (!"".equals(searchInput.getText().toString())) {
                     query = searchInput.getText().toString();
                     setClearTextIcon();
-                    System.out.println(query);
                     presenter.bandList(query);
-//
+
 //                    if (isRecentSuggestionsProvider) {
 //                        // Provider is descendant of SearchRecentSuggestionsProvider
 //                        mapResultsFromRecentProviderToList();
@@ -452,9 +446,10 @@ public class SearchActivity extends AppCompatActivity implements SearchView{
         for(String band: list)
         {
 
-            ResultItem aux = new ResultItem(band, band,
-                    results.getInt(results.getColumnIndex(SearchManager.SUGGEST_COLUMN_ICON_1)),
-                    results.getInt(results.getColumnIndex(SearchManager.SUGGEST_COLUMN_ICON_2)));
+            ResultItem aux = new ResultItem(band, null,
+                    null,
+                    null
+                    );
             resultList.add(aux);
 
         }

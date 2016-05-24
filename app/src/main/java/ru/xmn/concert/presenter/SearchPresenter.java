@@ -1,12 +1,15 @@
 package ru.xmn.concert.presenter;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import ru.xmn.concert.model.ConcertsModel;
 import ru.xmn.concert.view.SearchActivity;
 import ru.xmn.concert.view.SearchView;
 import rx.Observer;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
 
 /**

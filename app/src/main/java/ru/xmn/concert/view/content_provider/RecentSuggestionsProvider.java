@@ -8,7 +8,7 @@ import android.content.SearchRecentSuggestionsProvider;
  */
 public class RecentSuggestionsProvider extends SearchRecentSuggestionsProvider {
 
-    public final static String AUTHORITY = "ru.xmn.concert.content_provider.RecentSuggestionsProvider";
+    public final static String AUTHORITY = "ru.xmn.concert.view.content_provider.RecentSuggestionsProvider";
     public final static int MODE = DATABASE_MODE_QUERIES;
 
     public RecentSuggestionsProvider() {
