@@ -1,42 +1,33 @@
 package ru.xmn.concert.presenter;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.util.List;
 
 import ru.xmn.concert.model.ConcertsModel;
-import ru.xmn.concert.model.data.EventGig;
-import ru.xmn.concert.view.MainView;
+import ru.xmn.concert.view.SearchActivity;
+import ru.xmn.concert.view.SearchView;
 import rx.Observer;
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
 
-import java.io.Serializable;
-import java.util.List;
-
 /**
- * Created by xmn on 19.05.2016.
+ * Created by xmn on 24.05.2016.
  */
-public class Presenter {
+
+public class SearchPresenter {
+    SearchView view;
     ConcertsModel concertsModel = new ConcertsModel();
-
-    private MainView mainView;
-
-    public Presenter(MainView mainView) {
-        this.mainView = mainView;
-    }
-
-
     private Subscription subscription = Subscriptions.empty();
 
+    public SearchPresenter(SearchView view) {
+        this.view = view;
+    }
 
-
-    public void eventList(String band) {
+    public void bandList(String band){
         if (!subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
-
-        subscription = concertsModel.eventList(band)
-                .subscribe(new Observer<List<EventGig>>() {
+        subscription = concertsModel.bandList(band)
+                .subscribe(new Observer<List<String>>() {
                     @Override
                     public void onCompleted() {
 
@@ -48,21 +39,12 @@ public class Presenter {
                     }
 
                     @Override
-                    public void onNext(List<EventGig> data) {
+                    public void onNext(List<String> data) {
                         if (data != null && !data.isEmpty()) {
-                            mainView.showData(data);
+                            view.showData(data);
                         } else {
                         }
                     }
                 });
     }
-
-
-
-    public ConcertsModel getConcertsModel() {
-
-        return concertsModel;
-    }
-
-
 }

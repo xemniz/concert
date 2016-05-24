@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,5 +41,19 @@ public class RockGigApi {
             gigsList.add(gigData);
         }
         return gigsList;
+    }
+
+    public List<String> findBands (final String band) throws IOException {
+        Document doc = Jsoup.connect(
+                "http://rockgig.net/?submit.x=0&submit.y=0&t=" + URLEncoder.encode(band, "Cp1251") + "&q=search&c=msk")
+                .get();
+        List<String> bandsList = new ArrayList<>();
+
+        System.out.println(doc.getElementById("rsbList").text());
+        Elements bandsListJsoup = doc.getElementById("rsbList").getElementsByTag("a");
+        for (Element bandEl : bandsListJsoup){
+            bandsList.add(bandEl.text());
+        }
+        return bandsList;
     }
 }

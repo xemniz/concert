@@ -3,7 +3,10 @@ package ru.xmn.concert.view;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -31,9 +34,13 @@ import com.mikepenz.materialdrawer.model.interfaces.Badgeable;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import br.com.customsearchable.contract.CustomSearchableConstants;
+import br.com.customsearchable.model.CustomSearchableInfo;
+import br.com.customsearchable.model.ResultItem;
 import butterknife.Bind;
 import ru.xmn.concert.R;
 import ru.xmn.concert.model.data.EventGig;
@@ -49,7 +56,7 @@ import rx.functions.Action1;
 public class MainActivity extends AppCompatActivity implements MainView {
     private Drawer.Result drawerResult = null;
     private EventsAdapter adapter = new EventsAdapter();
-    private Presenter presenter;
+    private Presenter presenter = new Presenter(this);
     private SearchView searchView;
     RecyclerView recyclerView;
 
@@ -59,6 +66,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Все для поиска
+        CustomSearchableInfo.setTransparencyColor(Color.parseColor("#ccE3F2FD"));
+        Intent intent = getIntent();
+        handleIntent(intent);
 
         // Инициализируем Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -133,6 +144,30 @@ public class MainActivity extends AppCompatActivity implements MainView {
         fragmentManager.beginTransaction().add(R.id.content_frame, fragmentOne).commit();
     }
 
+
+    // Handles the intent that carries user's choice in the Search Interface
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+
+            Log.i("Main", "Received query: " + query);
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            Bundle bundle = this.getIntent().getExtras();
+
+            assert (bundle != null);
+
+            if (bundle != null) {
+                ResultItem receivedItem = bundle.getParcelable(CustomSearchableConstants.CLICKED_RESULT_ITEM);
+
+                Log.i("RI.header", receivedItem.getHeader());
+                Log.i("RI.subHeader", receivedItem.getSubHeader());
+                Log.i("RI.leftIcon", receivedItem.getLeftIcon().toString());
+                Log.i("RI.rightIcon", receivedItem.getRightIcon().toString());
+            }
+        }
+    }
+
+
     private void selectItem(int position) {
         // Update the main content by replacing fragments
         Fragment fragment = null;
@@ -176,33 +211,14 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) searchItem.getActionView();
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        if (null != searchManager) {
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        }
-        searchView.setIconifiedByDefault(false);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-        RxSearchView.queryTextChangeEvents(searchView)
-                .debounce(1000, TimeUnit.MILLISECONDS)
-                .subscribe(new Action1<SearchViewQueryTextEvent>() {
-                    @Override
-                    public void call(final SearchViewQueryTextEvent s) {
-                        presenter.onstart(s.queryText().toString());
-                    }
-                });
+//        RxSearchView.queryTextChangeEvents(searchView)
+//                .debounce(1000, TimeUnit.MILLISECONDS)
+//                .subscribe(new Action1<SearchViewQueryTextEvent>() {
+//                    @Override
+//                    public void call(final SearchViewQueryTextEvent s) {
+//                        presenter.onstart(s.queryText().toString());
+//                    }
+//                });
         return true;
 
     }
@@ -213,14 +229,21 @@ public class MainActivity extends AppCompatActivity implements MainView {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
         if (id == R.id.action_search) {
+            // Calls Custom Searchable Activity
+            Intent intent = new Intent(this, SearchActivity.class);
+            startActivity(intent);
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("ResourceType")
     @Override
     public void showData(List<EventGig> list) {
         FragmentOne fragmentOne = (FragmentOne)getSupportFragmentManager().findFragmentById(R.id.content_frame);

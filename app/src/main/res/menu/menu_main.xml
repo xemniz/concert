@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:yourapp="http://schemas.android.com/apk/res-auto">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="edsilfer.com.br.edsilfer.Main">
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_settings"
+
+        tools:ignore="AppCompatResource" />
 
     <item
         android:id="@+id/action_search"
-        android:title="@android:string/search_go"
-        android:icon="@drawable/abc_ic_search_api_mtrl_alpha"
-        yourapp:showAsAction="always|collapseActionView"
-        yourapp:actionViewClass="android.support.v7.widget.SearchView"
-        android:background="?attr/colorPrimary"
-        />
-
+        android:orderInCategory="200"
+        android:title="Search"
+        android:icon="@drawable/ic_search_white_18dp"
+        app:showAsAction="ifRoom"/>
 </menu>
