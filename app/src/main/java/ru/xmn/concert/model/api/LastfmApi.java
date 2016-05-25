@@ -11,6 +11,8 @@ public class LastfmApi {
     private final String secret = "b8c42600c5d31faa6d282cb5f104b9b9";   // api secret
 
     public Artist getBandInfo (String band){
+
         return Artist.getInfo(band, key);
     }
+
 }

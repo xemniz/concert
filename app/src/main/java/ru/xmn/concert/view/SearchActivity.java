@@ -116,7 +116,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView{
     // Sends an intent with the typed query to the searchable Activity
     private void sendSuggestionIntent(ResultItem item) {
         try {
-            Intent sendIntent = new Intent(this, Class.forName(searchableActivity));
+//            Intent sendIntent = new Intent(this, Class.forName(searchableActivity));
+            Intent sendIntent = new Intent(this, Class.forName("ru.xmn.concert.view.BandActivity"));
             sendIntent.setAction(Intent.ACTION_VIEW);
             sendIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 

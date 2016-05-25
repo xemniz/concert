@@ -1,5 +1,7 @@
 package ru.xmn.concert.model;
 
+import de.umass.lastfm.Artist;
+import ru.xmn.concert.model.api.LastfmApi;
 import ru.xmn.concert.model.api.RockGigApi;
 import ru.xmn.concert.model.data.EventGig;
 import rx.Observable;
@@ -12,6 +14,7 @@ import java.util.List;
 
 public class ConcertsModel {
     RockGigApi rockGigApi = new RockGigApi();
+    LastfmApi lastfmApi = new LastfmApi();
 
     public Observable eventList(final String band) {
         return Observable
@@ -44,6 +47,18 @@ public class ConcertsModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 ;
+    }
+
+    public Observable getArtistInfo(final String band) {
+        return Observable
+                .create(new Observable.OnSubscribe<Artist>() {
+                    @Override
+                    public void call(Subscriber<? super Artist> subscriber) {
+                            subscriber.onNext(lastfmApi.getBandInfo(band));
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 }
