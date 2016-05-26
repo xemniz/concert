@@ -14,6 +14,9 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.transition.Slide;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -22,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v7.graphics.Palette;
 
+import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Callback;
 
 import com.squareup.picasso.Picasso;
@@ -32,17 +36,21 @@ import br.com.customsearchable.model.ResultItem;
 import de.umass.lastfm.Artist;
 import de.umass.lastfm.ImageSize;
 import ru.xmn.concert.R;
+import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.presenter.BandPresenter;
 
 public class BandActivity extends AppCompatActivity implements BandView {
-
     private static final String EXTRA_IMAGE = "com.antonioleiva.materializeyourapp.extraImage";
     private static final String EXTRA_TITLE = "com.antonioleiva.materializeyourapp.extraTitle";
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private BandPresenter presenter = new BandPresenter(this);
-    ImageView image;
 
-//    public static void navigate(AppCompatActivity activity, View transitionImage, ViewModel viewModel) {
+    private ImageView image;
+    private TextView descriptionTxt;
+    private ExpandableTextView expTv1;
+
+
+    //    public static void navigate(AppCompatActivity activity, View transitionImage, ViewModel viewModel) {
 //        Intent intent = new Intent(activity, BandActivity.class);
 //        intent.putExtra(EXTRA_IMAGE, viewModel.getImage());
 //        intent.putExtra(EXTRA_TITLE, viewModel.getText());
@@ -58,11 +66,12 @@ public class BandActivity extends AppCompatActivity implements BandView {
 //        setTheme(R.style.AppTheme);
         Intent intent = getIntent();
 
-
         initActivityTransitions();
-        setContentView(R.layout.activity_band);
 
+        setContentView(R.layout.activity_band);
         image = (ImageView) findViewById(R.id.image);
+        descriptionTxt = (TextView) findViewById(R.id.expandable_text);
+        expTv1 = (ExpandableTextView) findViewById(R.id.expand_text_view);
 
         ViewCompat.setTransitionName(findViewById(R.id.app_bar_layout), EXTRA_IMAGE);
         supportPostponeEnterTransition();
@@ -77,9 +86,6 @@ public class BandActivity extends AppCompatActivity implements BandView {
 
         System.out.println(itemTitle);
         presenter.getBandInfo(itemTitle);
-
-
-
 
         TextView title = (TextView) findViewById(R.id.title);
         title.setText(itemTitle);
@@ -153,10 +159,10 @@ public class BandActivity extends AppCompatActivity implements BandView {
     }
 
     @Override
-    public void showData(Artist artist) {
+    public void showData(Band bandDTO) {
         Picasso
                 .with(this)
-                .load(artist.getImageURL(ImageSize.EXTRALARGE))
+                .load(bandDTO.getImageUrl())
                 .into(image, new Callback() {
                     @Override public void onSuccess() {
                         Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
@@ -171,6 +177,10 @@ public class BandActivity extends AppCompatActivity implements BandView {
 
                     }
                 });
+
+
+//        expTv1.setText(Html.fromHtml(bandDTO.getWiki()));
+        descriptionTxt.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
 }

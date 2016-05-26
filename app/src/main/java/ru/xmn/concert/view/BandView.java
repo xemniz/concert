@@ -1,11 +1,7 @@
 package ru.xmn.concert.view;
 
-import de.umass.lastfm.Artist;
-
-/**
- * Created by xmn on 25.05.2016.
- */
+import ru.xmn.concert.model.data.Band;
 
 public interface BandView {
-    public void showData(Artist artist);
+    public void showData(Band bandDTO);
 }

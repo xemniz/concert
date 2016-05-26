@@ -2,6 +2,7 @@ package ru.xmn.concert.presenter;
 
 import de.umass.lastfm.Artist;
 import ru.xmn.concert.model.ConcertsModel;
+import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.view.BandView;
 import ru.xmn.concert.view.MainView;
 import rx.Observer;
@@ -32,10 +33,9 @@ public class BandPresenter {
             subscription.unsubscribe();
         }
 
-        concertsModel.getArtistInfo(band).subscribe(new Observer<Artist>() {
+        concertsModel.getArtistInfo(band).subscribe(new Observer<Band>() {
             @Override
             public void onCompleted() {
-
             }
 
             @Override
@@ -44,7 +44,7 @@ public class BandPresenter {
             }
 
             @Override
-            public void onNext(Artist data) {
+            public void onNext(Band data) {
                 if (data != null) {
                     mainView.showData(data);
                 } else {

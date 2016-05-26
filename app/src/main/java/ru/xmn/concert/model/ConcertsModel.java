@@ -3,6 +3,7 @@ package ru.xmn.concert.model;
 import de.umass.lastfm.Artist;
 import ru.xmn.concert.model.api.LastfmApi;
 import ru.xmn.concert.model.api.RockGigApi;
+import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
 import rx.Observable;
 import rx.Subscriber;
@@ -51,10 +52,14 @@ public class ConcertsModel {
 
     public Observable getArtistInfo(final String band) {
         return Observable
-                .create(new Observable.OnSubscribe<Artist>() {
+                .create(new Observable.OnSubscribe<Band>() {
                     @Override
-                    public void call(Subscriber<? super Artist> subscriber) {
+                    public void call(Subscriber<? super Band> subscriber) {
+                        try {
                             subscriber.onNext(lastfmApi.getBandInfo(band));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 })
                 .subscribeOn(Schedulers.io())
