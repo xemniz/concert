@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -24,8 +25,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v7.graphics.Palette;
-
-import com.ms.square.android.expandabletextview.ExpandableTextView;
 import com.squareup.picasso.Callback;
 
 import com.squareup.picasso.Picasso;
@@ -47,7 +46,7 @@ public class BandActivity extends AppCompatActivity implements BandView {
 
     private ImageView image;
     private TextView descriptionTxt;
-    private ExpandableTextView expTv1;
+    private CardView descrCardView;
 
 
     //    public static void navigate(AppCompatActivity activity, View transitionImage, ViewModel viewModel) {
@@ -71,7 +70,7 @@ public class BandActivity extends AppCompatActivity implements BandView {
         setContentView(R.layout.activity_band);
         image = (ImageView) findViewById(R.id.image);
         descriptionTxt = (TextView) findViewById(R.id.expandable_text);
-        expTv1 = (ExpandableTextView) findViewById(R.id.expand_text_view);
+        descrCardView = (CardView) findViewById(R.id.cardView);
 
         ViewCompat.setTransitionName(findViewById(R.id.app_bar_layout), EXTRA_IMAGE);
         supportPostponeEnterTransition();
@@ -160,6 +159,9 @@ public class BandActivity extends AppCompatActivity implements BandView {
 
     @Override
     public void showData(Band bandDTO) {
+        descriptionTxt.setText(Html.fromHtml(bandDTO.getWiki()));
+        descriptionTxt.setMovementMethod(LinkMovementMethod.getInstance());
+
         Picasso
                 .with(this)
                 .load(bandDTO.getImageUrl())
@@ -177,10 +179,5 @@ public class BandActivity extends AppCompatActivity implements BandView {
 
                     }
                 });
-
-
-//        expTv1.setText(Html.fromHtml(bandDTO.getWiki()));
-        descriptionTxt.setMovementMethod(LinkMovementMethod.getInstance());
     }
-
 }

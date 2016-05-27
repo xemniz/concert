@@ -49,4 +49,5 @@ dependencies {
     compile 'com.android.support:palette-v7:23.4.0'
 
     compile 'com.ms-square:expandableTextView:0.1.4'
+    compile 'com.github.aakira:expandable-layout:1.5.1@aar'
 }
