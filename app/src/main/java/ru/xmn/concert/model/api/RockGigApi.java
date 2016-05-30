@@ -24,10 +24,12 @@ public class RockGigApi {
      * @throws IOException
      */
     public List<EventGig> eventsByBand (final String band) throws IOException {
-        System.out.println(band+"band in rockgigapi");
+
+        System.out.println(band+" band in rockgigapi");
         Document doc = Jsoup.connect("http://rockgig.net/?submit.x=0&submit.y=0&t=" + URLEncoder.encode(band, "Cp1251") + "&q=search&c=msk")
                 .get();
-        System.out.println("after getting doc");
+        System.out.println(band+" after getting doc");
+
         List<EventGig> gigsList = new ArrayList<>();
         Elements gigs = doc.getElementsByClass("ElDiv");
         for (Element gigEl : gigs){

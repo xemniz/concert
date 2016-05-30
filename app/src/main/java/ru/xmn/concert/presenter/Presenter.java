@@ -15,7 +15,10 @@ import ru.xmn.concert.view.MainView;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
 
 import java.io.Serializable;
@@ -69,14 +72,27 @@ public class Presenter {
                 VKList<VKApiAudio> list =(VKList<VKApiAudio>) response.parsedModel;
                 concertsModel.setList(list);
 
-                Observable
-                        .from(list)
-                        .debounce(3, TimeUnit.SECONDS)
-                        .subscribe(vkApiAudio -> eventList(vkApiAudio.artist));
+//                Observable
+//                        .from(list)
+//                        .debounce(3, TimeUnit.SECONDS)
+//                        .subscribeOn(Schedulers.io())
+//                        .subscribe(vkApiAudio -> eventList(vkApiAudio.artist));
 
                 Observable
                         .from(list)
-                        .flatMap(vkApiAudio -> concertsModel.eventList(vkApiAudio.artist))
+                        .flatMap(new Func1<VKApiAudio, Observable<String>>() {
+                            @Override
+                            public Observable<String> call(VKApiAudio vkApiAudio) {
+                                return Observable.just(vkApiAudio.artist);
+                            }
+                        })
+                        .distinct()
+                        .flatMap(s -> concertsModel.eventList(s))
+//                        .take(20)
+//                        .flatMap(vkApiAudio -> concertsModel.eventList(vkApiAudio.artist))
+//                        .concatMap(vkApiAudio -> concertsModel.eventList(vkApiAudio.artist))
+//                        .debounce(3, TimeUnit.SECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Observer<List<EventGig>>() {
                             @Override
                             public void onCompleted() {

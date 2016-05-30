@@ -6,6 +6,7 @@ import com.vk.sdk.api.model.VKApiAudio;
 import com.vk.sdk.api.model.VKList;
 
 import de.umass.lastfm.Artist;
+import ru.xmn.concert.JobExecutor;
 import ru.xmn.concert.model.api.LastfmApi;
 import ru.xmn.concert.model.api.RockGigApi;
 import ru.xmn.concert.model.data.Band;
@@ -17,6 +18,7 @@ import rx.schedulers.Schedulers;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ConcertsModel {
     RockGigApi rockGigApi = new RockGigApi();
@@ -32,6 +34,8 @@ public class ConcertsModel {
     }
 
     public Observable eventList(final String band) {
+        System.out.println(band+" in eventlist");
+
         return Observable
                 .create(new Observable.OnSubscribe<List<EventGig>>() {
                     @Override
@@ -43,9 +47,10 @@ public class ConcertsModel {
                         }
                     }
                 })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .subscribeOn(Schedulers.from(JobExecutor.getInstance()));
+//                .observeOn(AndroidSchedulers.mainThread());
     }
+
     public Observable bandList(final String band) {
         return Observable
                 .create(new Observable.OnSubscribe<List<String>>() {
@@ -63,6 +68,7 @@ public class ConcertsModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 ;
     }
+
     public Observable getArtistInfo(final String band) {
         return Observable
                 .create(new Observable.OnSubscribe<Band>() {
@@ -78,7 +84,8 @@ public class ConcertsModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    public VKRequest bandList(){
+
+    public VKRequest bandList() {
         return VKApi.audio().get();
     }
 
