@@ -1,5 +1,10 @@
 package ru.xmn.concert.model;
 
+import com.vk.sdk.api.VKApi;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.model.VKApiAudio;
+import com.vk.sdk.api.model.VKList;
+
 import de.umass.lastfm.Artist;
 import ru.xmn.concert.model.api.LastfmApi;
 import ru.xmn.concert.model.api.RockGigApi;
@@ -16,6 +21,15 @@ import java.util.List;
 public class ConcertsModel {
     RockGigApi rockGigApi = new RockGigApi();
     LastfmApi lastfmApi = new LastfmApi();
+    VKList<VKApiAudio> list;
+
+    public VKList<VKApiAudio> getList() {
+        return list;
+    }
+
+    public void setList(VKList<VKApiAudio> list) {
+        this.list = list;
+    }
 
     public Observable eventList(final String band) {
         return Observable
@@ -49,7 +63,6 @@ public class ConcertsModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 ;
     }
-
     public Observable getArtistInfo(final String band) {
         return Observable
                 .create(new Observable.OnSubscribe<Band>() {
@@ -64,6 +77,9 @@ public class ConcertsModel {
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+    public VKRequest bandList(){
+        return VKApi.audio().get();
     }
 
 }

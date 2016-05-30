@@ -10,14 +10,24 @@ public class EventGig {
     private String place;
     private String name;
     private String price;
+    private String requestBand;
 
-    public EventGig(String band, String date, String time, String place, String name, String price) {
+    public EventGig(String band, String date, String time, String place, String name, String price, String requestBand) {
         this.band = band;
         this.date = date;
         this.time = time;
         this.place = place;
         this.name = name;
         this.price = price;
+        this.requestBand = requestBand;
+    }
+
+    public String getRequestBand() {
+        return requestBand;
+    }
+
+    public void setRequestBand(String requestBand) {
+        this.requestBand = requestBand;
     }
 
     public String getTime() {

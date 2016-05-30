@@ -36,11 +36,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
         EventGig eventGig = eventGigs.get(i);
-        viewHolder.name.setText(eventGig.getPlace() + " - " + eventGig.getName());
-        viewHolder.band.setText(eventGig.getBand());
-        viewHolder.date.setText(eventGig.getDate());
-        viewHolder.time.setText(eventGig.getTime());
-        viewHolder.price.setText(eventGig.getPrice());
+//        viewHolder.name.setText(eventGig.getName());
+        viewHolder.name.setText(eventGig.getRequestBand());
+        viewHolder.date.setText(eventGig.getDate()+", "+eventGig.getTime()+", "+eventGig.getPrice());
+        viewHolder.place.setText(eventGig.getPlace());
     }
 
     @Override
@@ -51,18 +50,25 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView name;
-        private TextView band;
+        private TextView place;
         private TextView date;
-        private TextView time;
-        private TextView price;
 
         public ViewHolder(View itemView) {
             super(itemView);
             name = (TextView) itemView.findViewById(R.id.nameTxt);
-            band = (TextView) itemView.findViewById(R.id.bandsTxt);
+            place = (TextView) itemView.findViewById(R.id.placeTxt);
             date = (TextView) itemView.findViewById(R.id.dateTxt);
-            time = (TextView) itemView.findViewById(R.id.timeTxt);
-            price = (TextView) itemView.findViewById(R.id.priceTxt);
         }
+
+    }
+    public void add(EventGig gig, int position) {
+        eventGigs.add(position, gig);
+        notifyItemInserted(position);
+    }
+
+    public void remove(EventGig gig) {
+        int position = eventGigs.indexOf(gig);
+        eventGigs.remove(position);
+        notifyItemRemoved(position);
     }
 }

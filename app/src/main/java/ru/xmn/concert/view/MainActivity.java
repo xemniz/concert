@@ -1,12 +1,14 @@
 package ru.xmn.concert.view;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +35,13 @@ import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Badgeable;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
+import com.vk.sdk.VKAccessToken;
+import com.vk.sdk.VKAccessTokenTracker;
+import com.vk.sdk.VKCallback;
+import com.vk.sdk.VKScope;
+import com.vk.sdk.VKSdk;
+import com.vk.sdk.VKUIHelper;
+import com.vk.sdk.api.VKError;
 
 import java.io.Serializable;
 import java.util.List;
@@ -54,17 +63,34 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 public class MainActivity extends AppCompatActivity implements MainView {
+    private static final String VK_APP_ID = "c5ciaBldtbUggy09v9m1";
     private Drawer.Result drawerResult = null;
     private EventsAdapter adapter = new EventsAdapter();
     private Presenter presenter = new Presenter(this);
     private SearchView searchView;
     RecyclerView recyclerView;
 
+    private static final String[] sMyScope = new String[]{
+            VKScope.FRIENDS,
+            VKScope.WALL,
+            VKScope.PHOTOS,
+            VKScope.NOHTTPS,
+            VKScope.MESSAGES,
+            VKScope.DOCS,
+            VKScope.AUDIO
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+
         presenter = new Presenter(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //vk
+        VKSdk.login(this, sMyScope);
 
         //Все для поиска
         CustomSearchableInfo.setTransparencyColor(Color.parseColor("#ccE3F2FD"));
@@ -246,9 +272,33 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void showData(List<EventGig> list) {
-        FragmentOne fragmentOne = (FragmentOne)getSupportFragmentManager().findFragmentById(R.id.content_frame);
-        EventsAdapter eventsAdapter= fragmentOne.getAdapter();
-        fragmentOne.getAdapter().setGigList(list);
+        FragmentOne fragmentOne = (FragmentOne) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        for(EventGig gig:list)
+            fragmentOne.getAdapter().add(gig, 0);
+//        fragmentOne.getAdapter().setGigList(list);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        VKCallback<VKAccessToken> callback = new VKCallback<VKAccessToken>() {
+            @Override
+            public void onResult(VKAccessToken res) {
+                // User passed Authorization
+                System.out.println("VKTEST123");
+                presenter.bandList();
+            }
+
+            @Override
+            public void onError(VKError error) {
+                // User didn't pass Authorization
+            }
+        };
+
+        if (!VKSdk.onActivityResult(requestCode, resultCode, data, callback)) {
+            super.onActivityResult(requestCode, resultCode, data);
+
+
+        }
     }
 
 }

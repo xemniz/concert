@@ -1,8 +1,11 @@
 package ru.xmn.concert.presenter;
 
+import java.util.List;
+
 import de.umass.lastfm.Artist;
 import ru.xmn.concert.model.ConcertsModel;
 import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.view.BandView;
 import ru.xmn.concert.view.MainView;
 import rx.Observer;
@@ -51,5 +54,32 @@ public class BandPresenter {
                 }
             }
         });
+    }
+
+    public void getBandEvents(String band) {
+        if (!subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+        }
+
+        subscription = concertsModel.eventList(band)
+                .subscribe(new Observer<List<EventGig>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(List<EventGig> data) {
+                        if (data != null && !data.isEmpty()) {
+                            mainView.showEvents(data);
+                        } else {
+                        }
+                    }
+                });
     }
 }

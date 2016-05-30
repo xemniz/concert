@@ -29,9 +29,6 @@ public class FragmentOne extends Fragment {
         adapter = new EventsAdapter();
         recyclerView.setAdapter(adapter);
 
-
-
-
         return rootView;
     }
 

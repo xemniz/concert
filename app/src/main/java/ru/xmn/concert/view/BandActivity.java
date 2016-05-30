@@ -14,6 +14,8 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -29,6 +31,8 @@ import com.squareup.picasso.Callback;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import br.com.customsearchable.contract.CustomSearchableConstants;
 import br.com.customsearchable.model.CustomSearchableInfo;
 import br.com.customsearchable.model.ResultItem;
@@ -36,7 +40,9 @@ import de.umass.lastfm.Artist;
 import de.umass.lastfm.ImageSize;
 import ru.xmn.concert.R;
 import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.presenter.BandPresenter;
+import ru.xmn.concert.view.adapters.EventsAdapter;
 
 public class BandActivity extends AppCompatActivity implements BandView {
     private static final String EXTRA_IMAGE = "com.antonioleiva.materializeyourapp.extraImage";
@@ -47,6 +53,9 @@ public class BandActivity extends AppCompatActivity implements BandView {
     private ImageView image;
     private TextView descriptionTxt;
     private CardView descrCardView;
+    private RecyclerView eventsRecView;
+
+    private EventsAdapter adapter = new EventsAdapter();
 
 
     //    public static void navigate(AppCompatActivity activity, View transitionImage, ViewModel viewModel) {
@@ -70,7 +79,10 @@ public class BandActivity extends AppCompatActivity implements BandView {
         setContentView(R.layout.activity_band);
         image = (ImageView) findViewById(R.id.image);
         descriptionTxt = (TextView) findViewById(R.id.expandable_text);
-        descrCardView = (CardView) findViewById(R.id.cardView);
+//        descrCardView = (CardView) findViewById(R.id.cardView);
+        eventsRecView = (RecyclerView)  findViewById(R.id.eventsRecyclerView);
+        eventsRecView.setLayoutManager(new LinearLayoutManager(this));
+        eventsRecView.setAdapter(adapter);
 
         ViewCompat.setTransitionName(findViewById(R.id.app_bar_layout), EXTRA_IMAGE);
         supportPostponeEnterTransition();
@@ -78,13 +90,15 @@ public class BandActivity extends AppCompatActivity implements BandView {
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //get band name from intent
         String itemTitle = handleIntent(intent);
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(itemTitle);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
 
-        System.out.println(itemTitle);
+        //get band info from API
         presenter.getBandInfo(itemTitle);
+        presenter.getBandEvents(itemTitle);
 
         TextView title = (TextView) findViewById(R.id.title);
         title.setText(itemTitle);
@@ -179,5 +193,10 @@ public class BandActivity extends AppCompatActivity implements BandView {
 
                     }
                 });
+    }
+
+    @Override
+    public void showEvents(List<EventGig> data) {
+        adapter.setGigList(data);
     }
 }
