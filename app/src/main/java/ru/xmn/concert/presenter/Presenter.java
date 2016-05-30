@@ -64,12 +64,13 @@ public class Presenter {
                     }
                 });
     }
-    public void bandList(){
+
+    public void bandList() {
         concertsModel.bandList().executeWithListener(new VKRequest.VKRequestListener() {
             @Override
             public void onComplete(VKResponse response) {
                 super.onComplete(response);
-                VKList<VKApiAudio> list =(VKList<VKApiAudio>) response.parsedModel;
+                VKList<VKApiAudio> list = (VKList<VKApiAudio>) response.parsedModel;
                 concertsModel.setList(list);
 
 //                Observable
@@ -80,18 +81,9 @@ public class Presenter {
 
                 Observable
                         .from(list)
-                        .flatMap(new Func1<VKApiAudio, Observable<String>>() {
-                            @Override
-                            public Observable<String> call(VKApiAudio vkApiAudio) {
-                                return Observable.just(vkApiAudio.artist);
-                            }
-                        })
+                        .flatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))
                         .distinct()
                         .flatMap(s -> concertsModel.eventList(s))
-//                        .take(20)
-//                        .flatMap(vkApiAudio -> concertsModel.eventList(vkApiAudio.artist))
-//                        .concatMap(vkApiAudio -> concertsModel.eventList(vkApiAudio.artist))
-//                        .debounce(3, TimeUnit.SECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Observer<List<EventGig>>() {
                             @Override
