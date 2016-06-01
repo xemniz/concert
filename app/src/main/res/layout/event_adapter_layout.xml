@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="256dp">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/vk_grey_color"/>
+
+    <TextView
+        android:id="@+id/adapterEventInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="4 june, fri, 3500"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
+        />
+
+    <TextView
+        android:id="@+id/adapterEventName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Фестиваль боль"
+        android:layout_above="@id/adapterEventInfo"
+        android:layout_alignStart="@+id/adapterEventInfo"
+        android:layout_marginBottom="4dp"
+        android:textSize="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ploho"
+        android:layout_above="@+id/adapterEventName"
+        android:layout_alignStart="@+id/adapterEventName"
+        android:textSize="32dp"
+        android:layout_marginBottom="12dp"/>
+
+
+
+</RelativeLayout>

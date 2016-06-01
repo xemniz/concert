@@ -42,6 +42,7 @@ import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.VKUIHelper;
 import com.vk.sdk.api.VKError;
+import com.vk.sdk.util.VKUtil;
 
 import java.io.Serializable;
 import java.util.List;
@@ -82,9 +83,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
-
         presenter = new Presenter(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

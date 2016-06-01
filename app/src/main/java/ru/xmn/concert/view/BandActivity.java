@@ -58,7 +58,7 @@ public class BandActivity extends AppCompatActivity implements BandView {
     private EventsAdapter adapter = new EventsAdapter();
 
 
-    //    public static void navigate(AppCompatActivity activity, View transitionImage, ViewModel viewModel) {
+//        public static void navigate(AppCompatActivity activity, View transitionImage, ViewModel viewModel) {
 //        Intent intent = new Intent(activity, BandActivity.class);
 //        intent.putExtra(EXTRA_IMAGE, viewModel.getImage());
 //        intent.putExtra(EXTRA_TITLE, viewModel.getText());
