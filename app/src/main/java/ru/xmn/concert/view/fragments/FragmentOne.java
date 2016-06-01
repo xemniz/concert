@@ -11,11 +11,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import ru.xmn.concert.R;
+import ru.xmn.concert.view.adapters.BandsEventsAdapter;
 import ru.xmn.concert.view.adapters.EventsAdapter;
 
 public class FragmentOne extends Fragment {
 
-    private EventsAdapter adapter;
+    private BandsEventsAdapter adapter;
 
     public FragmentOne() {
     }
@@ -26,13 +27,13 @@ public class FragmentOne extends Fragment {
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new EventsAdapter();
+        adapter = new BandsEventsAdapter(this.getContext());
         recyclerView.setAdapter(adapter);
 
         return rootView;
     }
 
-    public EventsAdapter getAdapter() {
+    public BandsEventsAdapter getAdapter() {
         return adapter;
     }
 }

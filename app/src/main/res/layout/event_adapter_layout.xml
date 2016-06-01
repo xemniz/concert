@@ -4,9 +4,11 @@
     android:layout_height="256dp">
 
     <ImageView
+        android:id="@+id/adapterBandImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/vk_grey_color"/>
+        android:background="@color/vk_grey_color"
+        android:scaleType="centerCrop"/>
 
     <TextView
         android:id="@+id/adapterEventInfo"
@@ -16,7 +18,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="16dp"
         android:layout_marginLeft="16dp"
-        />
+        android:textColor="@color/vk_white"/>
 
     <TextView
         android:id="@+id/adapterEventName"
@@ -26,17 +28,18 @@
         android:layout_above="@id/adapterEventInfo"
         android:layout_alignStart="@+id/adapterEventInfo"
         android:layout_marginBottom="4dp"
+        android:textColor="@color/vk_white"
         android:textSize="16dp"/>
 
     <TextView
+        android:id="@+id/adapterBandName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Ploho"
         android:layout_above="@+id/adapterEventName"
         android:layout_alignStart="@+id/adapterEventName"
         android:textSize="32dp"
+        android:textColor="@color/vk_white"
         android:layout_marginBottom="12dp"/>
-
-
 
 </RelativeLayout>

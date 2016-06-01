@@ -5,6 +5,7 @@ package ru.xmn.concert.model.data;
  */
 public class EventGig {
     private String band;
+    private String bandImageUrl;
     private String date;
     private String time;
     private String place;
@@ -20,6 +21,14 @@ public class EventGig {
         this.name = name;
         this.price = price;
         this.requestBand = requestBand;
+    }
+
+    public String getBandImageUrl() {
+        return bandImageUrl;
+    }
+
+    public void setBandImageUrl(String bandImageUrl) {
+        this.bandImageUrl = bandImageUrl;
     }
 
     public String getRequestBand() {

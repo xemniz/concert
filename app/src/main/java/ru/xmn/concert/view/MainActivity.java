@@ -235,14 +235,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-//        RxSearchView.queryTextChangeEvents(searchView)
-//                .debounce(1000, TimeUnit.MILLISECONDS)
-//                .subscribe(new Action1<SearchViewQueryTextEvent>() {
-//                    @Override
-//                    public void call(final SearchViewQueryTextEvent s) {
-//                        presenter.onstart(s.queryText().toString());
-//                    }
-//                });
         return true;
 
     }

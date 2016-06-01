@@ -73,12 +73,6 @@ public class Presenter {
                 VKList<VKApiAudio> list = (VKList<VKApiAudio>) response.parsedModel;
                 concertsModel.setList(list);
 
-//                Observable
-//                        .from(list)
-//                        .debounce(3, TimeUnit.SECONDS)
-//                        .subscribeOn(Schedulers.io())
-//                        .subscribe(vkApiAudio -> eventList(vkApiAudio.artist));
-
                 Observable
                         .from(list)
                         .flatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))

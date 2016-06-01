@@ -11,12 +11,18 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
+import de.umass.lastfm.Artist;
+import de.umass.lastfm.ImageSize;
 import ru.xmn.concert.model.data.EventGig;
 
 
 public class RockGigApi {
 
+    Locale dLocale = new Locale("ru", "RU");
+    private final String key = "2bfb15fbcefb91f170233c99ff4af225";      // api key
+    private final String secret = "b8c42600c5d31faa6d282cb5f104b9b9";   // api secret
     /**
      *
      * @param band
@@ -45,6 +51,8 @@ public class RockGigApi {
                         gigEl.getElementsByClass("ElDivTime").get(0).text().substring(timePrice.indexOf("/")+2),
                         band
                         );
+                Artist artistLFMAPI = Artist.getInfo(band,dLocale,"pe-psy",  key);
+                gigData.setBandImageUrl(artistLFMAPI.getImageURL(ImageSize.EXTRALARGE));
                 System.out.println(gigData.toString());
                 gigsList.add(gigData);
             }
