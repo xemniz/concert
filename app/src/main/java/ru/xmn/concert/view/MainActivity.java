@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     public void showData(List<EventGig> list) {
         FragmentOne fragmentOne = (FragmentOne) getSupportFragmentManager().findFragmentById(R.id.content_frame);
         for(EventGig gig:list)
-            fragmentOne.getAdapter().add(gig, 0);
+            fragmentOne.getAdapter().add(gig, fragmentOne.getAdapter().getItemCount());
 //        fragmentOne.getAdapter().setGigList(list);
     }
 
