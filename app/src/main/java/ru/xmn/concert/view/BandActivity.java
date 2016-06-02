@@ -52,7 +52,6 @@ public class BandActivity extends AppCompatActivity implements BandView {
 
     private ImageView image;
     private TextView descriptionTxt;
-    private CardView descrCardView;
     private RecyclerView eventsRecView;
 
     private EventsAdapter adapter = new EventsAdapter();

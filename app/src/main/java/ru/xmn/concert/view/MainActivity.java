@@ -1,14 +1,10 @@
 package ru.xmn.concert.view;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -20,12 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.jakewharton.rxbinding.support.v7.widget.RxSearchView;
-import com.jakewharton.rxbinding.support.v7.widget.SearchViewQueryTextEvent;
 import com.mikepenz.iconics.typeface.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
@@ -36,32 +29,24 @@ import com.mikepenz.materialdrawer.model.interfaces.Badgeable;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.vk.sdk.VKAccessToken;
-import com.vk.sdk.VKAccessTokenTracker;
 import com.vk.sdk.VKCallback;
 import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
-import com.vk.sdk.VKUIHelper;
 import com.vk.sdk.api.VKError;
-import com.vk.sdk.util.VKUtil;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import br.com.customsearchable.contract.CustomSearchableConstants;
 import br.com.customsearchable.model.CustomSearchableInfo;
 import br.com.customsearchable.model.ResultItem;
-import butterknife.Bind;
 import ru.xmn.concert.R;
 import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.presenter.Presenter;
 import ru.xmn.concert.view.adapters.EventsAdapter;
-import ru.xmn.concert.view.fragments.FragmentOne;
+import ru.xmn.concert.view.fragments.FragmentVk;
 import ru.xmn.concert.view.fragments.FragmentThree;
 import ru.xmn.concert.view.fragments.FragmentTwo;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
+import ru.xmn.concert.view.fragments.FragmentVkSettings;
 
 public class MainActivity extends AppCompatActivity implements MainView {
     private static final String VK_APP_ID = "c5ciaBldtbUggy09v9m1";
@@ -70,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private Presenter presenter = new Presenter(this);
     private SearchView searchView;
     RecyclerView recyclerView;
+
+    FragmentVk fragmentVk = new FragmentVk();
+    FragmentVkSettings fragmentVkSettings = new FragmentVkSettings();
 
     private static final String[] sMyScope = new String[]{
             VKScope.FRIENDS,
@@ -88,7 +76,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
         setContentView(R.layout.activity_main);
 
         //vk
-        VKSdk.login(this, sMyScope);
+        if (!VKSdk.wakeUpSession(this)) {
+            VKSdk.login(this, sMyScope);
+        }
+        else
+        {
+            presenter.bandList();
+        }
 
         //Все для поиска
         CustomSearchableInfo.setTransparencyColor(Color.parseColor("#ccE3F2FD"));
@@ -163,9 +157,11 @@ public class MainActivity extends AppCompatActivity implements MainView {
                     }
                 })
                 .build();
-        FragmentOne fragmentOne = new FragmentOne();
+
+        //Start fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.content_frame, fragmentOne).commit();
+        fragmentManager.beginTransaction().add(R.id.content_frame, fragmentVk).commit();
+        fragmentManager.beginTransaction().add(R.id.settings_frame, fragmentVkSettings).commit();
     }
 
 
@@ -197,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         Fragment fragment = null;
         switch (position) {
             case 1:
-                fragment = new FragmentOne();
+                fragment = new FragmentVk();
                 break;
             case 2:
                 fragment = new FragmentTwo();
@@ -262,10 +258,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void showData(List<EventGig> list) {
-        FragmentOne fragmentOne = (FragmentOne) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        FragmentVk fragmentVk = (FragmentVk) getSupportFragmentManager().findFragmentById(R.id.content_frame);
         for(EventGig gig:list)
-            fragmentOne.getAdapter().add(gig, fragmentOne.getAdapter().getItemCount());
-//        fragmentOne.getAdapter().setGigList(list);
+            fragmentVk.getAdapter().add(gig, fragmentVk.getAdapter().getItemCount());
+//        fragmentVk.getAdapter().setGigList(list);
     }
 
     @Override
@@ -286,9 +282,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         if (!VKSdk.onActivityResult(requestCode, resultCode, data, callback)) {
             super.onActivityResult(requestCode, resultCode, data);
-
-
         }
     }
-
 }
