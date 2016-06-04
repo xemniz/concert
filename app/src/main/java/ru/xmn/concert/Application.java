@@ -1,10 +1,12 @@
-package ru.xmn.concert.view;
+package ru.xmn.concert;
 import android.content.Intent;
 import android.widget.Toast;
 
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKAccessTokenTracker;
 import com.vk.sdk.VKSdk;
+
+import ru.xmn.concert.view.MainActivity;
 
 public class Application extends android.app.Application {
 

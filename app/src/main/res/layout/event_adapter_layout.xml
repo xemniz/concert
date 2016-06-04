@@ -10,6 +10,11 @@
         android:background="@color/vk_grey_color"
         android:scaleType="centerCrop"/>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/trending_gradient_shape"/>
+
     <TextView
         android:id="@+id/adapterEventInfo"
         android:layout_width="wrap_content"

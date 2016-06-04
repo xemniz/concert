@@ -10,7 +10,9 @@ import ru.xmn.concert.view.BandView;
 import ru.xmn.concert.view.MainView;
 import rx.Observer;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
 
 /**
@@ -62,6 +64,7 @@ public class BandPresenter {
         }
 
         subscription = concertsModel.eventList(band)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<EventGig>>() {
                     @Override
                     public void onCompleted() {

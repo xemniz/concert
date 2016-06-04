@@ -12,8 +12,9 @@ public class EventGig {
     private String name;
     private String price;
     private String requestBand;
+    private int countOfSimilar;
 
-    public EventGig(String band, String date, String time, String place, String name, String price, String requestBand) {
+    public EventGig(String band, String date, String time, String place, String name, String price, String requestBand, int countOfSimilar) {
         this.band = band;
         this.date = date;
         this.time = time;
@@ -21,6 +22,11 @@ public class EventGig {
         this.name = name;
         this.price = price;
         this.requestBand = requestBand;
+        this.countOfSimilar = countOfSimilar;
+    }
+
+    public int getCountOfSimilar() {
+        return countOfSimilar;
     }
 
     public String getBandImageUrl() {

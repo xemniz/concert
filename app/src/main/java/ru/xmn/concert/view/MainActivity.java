@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         }
         else
         {
-            presenter.bandList();
+//            presenter.bandList();
         }
 
         //Все для поиска
@@ -259,8 +259,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     public void showData(List<EventGig> list) {
         FragmentVk fragmentVk = (FragmentVk) getSupportFragmentManager().findFragmentById(R.id.content_frame);
-        for(EventGig gig:list)
-            fragmentVk.getAdapter().add(gig, fragmentVk.getAdapter().getItemCount());
+            fragmentVk.getAdapter().add(list.get(0), fragmentVk.getAdapter().getItemCount());
 //        fragmentVk.getAdapter().setGigList(list);
     }
 
@@ -271,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
             public void onResult(VKAccessToken res) {
                 // User passed Authorization
                 System.out.println("VKTEST123");
-                presenter.bandList();
+//                presenter.bandList();
             }
 
             @Override

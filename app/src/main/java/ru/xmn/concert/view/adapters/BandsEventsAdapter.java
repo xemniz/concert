@@ -16,7 +16,6 @@ import java.util.List;
 
 import ru.xmn.concert.R;
 import ru.xmn.concert.model.data.EventGig;
-import ru.xmn.concert.view.Application;
 
 /**
  * Created by xmn on 01.06.2016.
@@ -50,7 +49,11 @@ public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.
 //        viewHolder.name.setText(eventGig.getName());
         viewHolder.name.setText(eventGig.getRequestBand());
         viewHolder.date.setText(eventGig.getDate()+", "+eventGig.getTime()+", "+eventGig.getPrice());
-        viewHolder.place.setText(eventGig.getPlace()+" - "+eventGig.getName());
+        if (eventGig.getCountOfSimilar()>1)
+            viewHolder.place.setText(eventGig.getPlace()+" - "+eventGig.getName()+" +"+ (eventGig.getCountOfSimilar()-1));
+        else
+            viewHolder.place.setText(eventGig.getPlace()+" - "+eventGig.getName());
+
         Picasso.with(context)
                 .load(eventGig.getBandImageUrl())
                 .into(viewHolder.image);
