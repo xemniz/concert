@@ -1,7 +1,9 @@
 package ru.xmn.concert.view;
 
 import java.util.List;
+import java.util.Set;
 
+import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
 
 /**
@@ -9,5 +11,5 @@ import ru.xmn.concert.model.data.EventGig;
  */
 
 public interface MainView {
-    public void showData(List<EventGig> list);
+    public void showData(Set<Band> list);
 }

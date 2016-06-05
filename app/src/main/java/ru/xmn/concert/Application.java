@@ -1,4 +1,5 @@
 package ru.xmn.concert;
+import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -9,6 +10,9 @@ import com.vk.sdk.VKSdk;
 import ru.xmn.concert.view.MainActivity;
 
 public class Application extends android.app.Application {
+
+    private static Application instance;
+    public static Application get() { return instance; }
 
     VKAccessTokenTracker vkAccessTokenTracker = new VKAccessTokenTracker() {
         @Override
@@ -25,7 +29,9 @@ public class Application extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
         vkAccessTokenTracker.startTracking();
         VKSdk.initialize(this);
+
     }
 }

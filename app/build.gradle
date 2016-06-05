@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+apply plugin: 'com.neenbedankt.android-apt'
+
 android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -31,6 +33,7 @@ repositories {
 }
 
 dependencies {
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
@@ -65,5 +68,21 @@ dependencies {
 
     apply plugin: 'com.android.application' // or apply plugin: 'java'
     apply plugin: 'me.tatarka.retrolambda'
+
+    compile 'com.arello-mobile:moxy:0.5.1'
+
+    compile 'com.arello-mobile:moxy-android:0.5.1'
+//    provided 'com.arello-mobile:moxy-compiler:0.5.1'
+
+    apt 'com.arello-mobile:moxy-compiler:0.5.1'
+
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
+    // http://mvnrepository.com/artifact/com.squareup.retrofit2/adapter-rxjava
+    compile group: 'com.squareup.retrofit2', name: 'adapter-rxjava', version: '2.0.2'
+
+    // http://mvnrepository.com/artifact/com.squareup.retrofit2/converter-gson
+    compile group: 'com.squareup.retrofit2', name: 'converter-gson', version: '2.0.2'
+    // http://mvnrepository.com/artifact/com.squareup.retrofit2/converter-scalars
+    compile group: 'com.squareup.retrofit2', name: 'converter-scalars', version: '2.0.2'
 
 }

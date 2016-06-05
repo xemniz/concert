@@ -35,11 +35,14 @@ import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKError;
 
 import java.util.List;
+import java.util.Set;
 
 import br.com.customsearchable.contract.CustomSearchableConstants;
 import br.com.customsearchable.model.CustomSearchableInfo;
 import br.com.customsearchable.model.ResultItem;
 import ru.xmn.concert.R;
+import ru.xmn.concert.model.api.RockGigApi;
+import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.presenter.Presenter;
 import ru.xmn.concert.view.adapters.EventsAdapter;
@@ -67,10 +70,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
             VKScope.MESSAGES,
             VKScope.DOCS,
             VKScope.AUDIO
+
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         presenter = new Presenter(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -81,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
         }
         else
         {
-//            presenter.bandList();
+            presenter.bandList();
         }
 
         //Все для поиска
@@ -257,9 +262,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
-    public void showData(List<EventGig> list) {
+    public void showData(Set<Band> list) {
         FragmentVk fragmentVk = (FragmentVk) getSupportFragmentManager().findFragmentById(R.id.content_frame);
-            fragmentVk.getAdapter().add(list.get(0), fragmentVk.getAdapter().getItemCount());
+        fragmentVk.getAdapter().setGigList(list);
 //        fragmentVk.getAdapter().setGigList(list);
     }
 
@@ -270,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
             public void onResult(VKAccessToken res) {
                 // User passed Authorization
                 System.out.println("VKTEST123");
-//                presenter.bandList();
+                presenter.bandList();
             }
 
             @Override

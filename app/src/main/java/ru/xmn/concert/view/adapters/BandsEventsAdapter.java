@@ -13,9 +13,12 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import ru.xmn.concert.R;
+import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
+import ru.xmn.concert.model.data.RockGigEvent;
 
 /**
  * Created by xmn on 01.06.2016.
@@ -23,15 +26,15 @@ import ru.xmn.concert.model.data.EventGig;
 
 public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.ViewHolder> {
 
-    private List<EventGig> eventGigs = new ArrayList<>();
+    private List<Band> bands = new ArrayList<>();
     private Context context;
 
     public BandsEventsAdapter(Context context) {
         this.context = context;
     }
 
-    public void setGigList(List<EventGig> repoList) {
-        this.eventGigs = repoList;
+    public void setGigList(Set<Band> repoList) {
+        this.bands.addAll(repoList);
         notifyDataSetChanged();
     }
 
@@ -45,23 +48,24 @@ public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
-        EventGig eventGig = eventGigs.get(i);
+        Band band = bands.get(i);
 //        viewHolder.name.setText(eventGig.getName());
-        viewHolder.name.setText(eventGig.getRequestBand());
-        viewHolder.date.setText(eventGig.getDate()+", "+eventGig.getTime()+", "+eventGig.getPrice());
-        if (eventGig.getCountOfSimilar()>1)
-            viewHolder.place.setText(eventGig.getPlace()+" - "+eventGig.getName()+" +"+ (eventGig.getCountOfSimilar()-1));
+        viewHolder.name.setText(band.getBand());
+        RockGigEvent event = band.getGigs().get(0);
+        viewHolder.date.setText(event.getDate()+", "+event.getTime()+", "+event.getPrice());
+        if (band.getGigs().size()>1)
+            viewHolder.place.setText(event.getPlace().getName()+" - "+event.getName()+" +"+ (band.getGigs().size()-1));
         else
-            viewHolder.place.setText(eventGig.getPlace()+" - "+eventGig.getName());
+            viewHolder.place.setText(event.getPlace().getName()+" - "+event.getName());
 
         Picasso.with(context)
-                .load(eventGig.getBandImageUrl())
+                .load(band.getBandImageUrl())
                 .into(viewHolder.image);
     }
 
     @Override
     public int getItemCount() {
-        return eventGigs.size();
+        return bands.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -80,14 +84,14 @@ public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.
         }
 
     }
-    public void add(EventGig gig, int position) {
-        eventGigs.add(position, gig);
+    public void add(Band gig, int position) {
+        bands.add(position, gig);
         notifyItemInserted(position);
     }
 
     public void remove(EventGig gig) {
-        int position = eventGigs.indexOf(gig);
-        eventGigs.remove(position);
+        int position = bands.indexOf(gig);
+        bands.remove(position);
         notifyItemRemoved(position);
     }
 }

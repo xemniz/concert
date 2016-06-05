@@ -1,5 +1,6 @@
 package ru.xmn.concert.view;
 
+
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -9,24 +10,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.text.util.Linkify;
 import android.transition.Slide;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v7.graphics.Palette;
+
+import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.squareup.picasso.Callback;
 
 import com.squareup.picasso.Picasso;
@@ -34,27 +31,28 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import br.com.customsearchable.contract.CustomSearchableConstants;
-import br.com.customsearchable.model.CustomSearchableInfo;
 import br.com.customsearchable.model.ResultItem;
-import de.umass.lastfm.Artist;
-import de.umass.lastfm.ImageSize;
 import ru.xmn.concert.R;
-import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.BandLastfm;
 import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.presenter.BandPresenter;
 import ru.xmn.concert.view.adapters.EventsAdapter;
 
-public class BandActivity extends AppCompatActivity implements BandView {
+public class BandActivity extends MvpAppCompatActivity implements BandView {
+    @InjectPresenter
+    BandPresenter presenter;
     private static final String EXTRA_IMAGE = "com.antonioleiva.materializeyourapp.extraImage";
     private static final String EXTRA_TITLE = "com.antonioleiva.materializeyourapp.extraTitle";
     private CollapsingToolbarLayout collapsingToolbarLayout;
-    private BandPresenter presenter = new BandPresenter(this);
+//    private BandPresenter presenter = new BandPresenter(this);
 
     private ImageView image;
     private TextView descriptionTxt;
     private RecyclerView eventsRecView;
 
     private EventsAdapter adapter = new EventsAdapter();
+
+
 
 
 //        public static void navigate(AppCompatActivity activity, View transitionImage, ViewModel viewModel) {
@@ -78,7 +76,6 @@ public class BandActivity extends AppCompatActivity implements BandView {
         setContentView(R.layout.activity_band);
         image = (ImageView) findViewById(R.id.image);
         descriptionTxt = (TextView) findViewById(R.id.expandable_text);
-//        descrCardView = (CardView) findViewById(R.id.cardView);
         eventsRecView = (RecyclerView)  findViewById(R.id.eventsRecyclerView);
         eventsRecView.setLayoutManager(new LinearLayoutManager(this));
         eventsRecView.setAdapter(adapter);
@@ -114,7 +111,7 @@ public class BandActivity extends AppCompatActivity implements BandView {
         String bandname = "";
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-
+            bandname = query;
             Log.i("Main", "Received query: " + query);
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             Bundle bundle = this.getIntent().getExtras();
@@ -171,13 +168,13 @@ public class BandActivity extends AppCompatActivity implements BandView {
     }
 
     @Override
-    public void showData(Band bandDTO) {
-        descriptionTxt.setText(Html.fromHtml(bandDTO.getWiki()));
+    public void showData(BandLastfm bandLastfmDTO) {
+        descriptionTxt.setText(Html.fromHtml(bandLastfmDTO.getWiki()));
         descriptionTxt.setMovementMethod(LinkMovementMethod.getInstance());
 
         Picasso
                 .with(this)
-                .load(bandDTO.getImageUrl())
+                .load(bandLastfmDTO.getImageUrl())
                 .into(image, new Callback() {
                     @Override public void onSuccess() {
                         Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();

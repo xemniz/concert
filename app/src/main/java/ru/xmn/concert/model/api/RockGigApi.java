@@ -1,12 +1,27 @@
 package ru.xmn.concert.model.api;
 
+import android.content.Context;
+import android.provider.MediaStore;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +30,16 @@ import java.util.Locale;
 
 import de.umass.lastfm.Artist;
 import de.umass.lastfm.ImageSize;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
+import ru.xmn.concert.Application;
+import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
+import ru.xmn.concert.model.data.RockGigEvent;
+import ru.xmn.concert.model.utils.Utils;
+import rx.Observable;
+import rx.schedulers.Schedulers;
 
 
 public class RockGigApi {
@@ -99,4 +123,46 @@ public class RockGigApi {
 //        }
         return bandsList;
     }
+
+    public Observable<List<RockGigEvent>> getEventsRockGig() {
+        System.out.println("INROCKGIGAPI");
+        Retrofit builder = new Retrofit.Builder()
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .baseUrl(" http://rockgig.net/feed/")
+                .build();
+        Appfeed appfeed = builder.create(Appfeed.class);
+        return appfeed.id()
+                .subscribeOn(Schedulers.io())
+                .map(s -> {
+                    try {
+                        return unZip(s);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .flatMap(s -> {
+                    Gson gson = new Gson();
+                    Type listType = new TypeToken<ArrayList<RockGigEvent>>() {
+                    }.getType();
+                    List<RockGigEvent> rockGigEvents = gson.fromJson(s, listType);
+                    return Observable.just(rockGigEvents);
+                });
+    }
+
+    private String unZip(String feedId) throws Exception {
+        File file = new File(Application.get().getBaseContext().getCacheDir(), "feed" + feedId);
+        File unzipped = new File(file, "appfeed" + feedId + ".json");
+
+        if (!unzipped.exists()) {
+            Utils.unpackArchive(new URL("http://rockgig.net/feed/appfeed" + feedId + ".zip"), file);
+            System.out.println("download zip");
+        }
+
+        return Utils.getStringFromFile(unzipped.getPath());
+    }
+
+
+
 }

@@ -10,6 +10,7 @@ import com.vk.sdk.api.model.VKApiAudio;
 import com.vk.sdk.api.model.VKList;
 
 import ru.xmn.concert.model.ConcertsModel;
+import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.view.MainView;
 import rx.Observable;
@@ -23,6 +24,7 @@ import rx.subscriptions.Subscriptions;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,13 +40,42 @@ public class Presenter {
 
     private Subscription subscription = Subscriptions.empty();
 
-    public void eventList(String band) {
+//    public void eventList(String band) {
+//        if (!subscription.isUnsubscribed()) {
+//            subscription.unsubscribe();
+//        }
+//
+//        subscription = concertsModel.eventList(band)
+//                .subscribe(new Observer<List<EventGig>>() {
+//                    @Override
+//                    public void onCompleted() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    @Override
+//                    public void onNext(List<EventGig> data) {
+//                        if (data != null && !data.isEmpty()) {
+//                            mainView.showData(data);
+//                        } else {
+//                        }
+//                    }
+//                });
+//    }
+
+    public void bandList() {
         if (!subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
+        System.out.println("");
 
-        subscription = concertsModel.eventList(band)
-                .subscribe(new Observer<List<EventGig>>() {
+        subscription = concertsModel
+                .getBandsGigsVk()
+                .subscribe(new Observer<Set<Band>>() {
                     @Override
                     public void onCompleted() {
 
@@ -56,67 +87,13 @@ public class Presenter {
                     }
 
                     @Override
-                    public void onNext(List<EventGig> data) {
+                    public void onNext(Set<Band> data) {
                         if (data != null && !data.isEmpty()) {
                             mainView.showData(data);
                         } else {
                         }
                     }
                 });
-    }
-
-    public void bandList() {
-        concertsModel.bandList().executeWithListener(new VKRequest.VKRequestListener() {
-            @Override
-            public void onComplete(VKResponse response) {
-                super.onComplete(response);
-                VKList<VKApiAudio> list = (VKList<VKApiAudio>) response.parsedModel;
-                concertsModel.setList(list);
-
-                Observable
-                        .from(list)
-                        .flatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))
-                        .distinct()
-                        .flatMap(s -> concertsModel.eventList(s))
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<List<EventGig>>() {
-                            @Override
-                            public void onCompleted() {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                e.printStackTrace();
-                            }
-
-                            @Override
-                            public void onNext(List<EventGig> data) {
-                                if (data != null && !data.isEmpty()) {
-                                    mainView.showData(data);
-                                } else {
-                                }
-                            }
-                        });
-            }
-
-            @Override
-            public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
-                super.attemptFailed(request, attemptNumber, totalAttempts);
-                System.out.println("attemptFailed");
-            }
-
-            @Override
-            public void onError(VKError error) {
-                super.onError(error);
-                System.out.println(error.toString());
-            }
-
-            @Override
-            public void onProgress(VKRequest.VKProgressType progressType, long bytesLoaded, long bytesTotal) {
-                super.onProgress(progressType, bytesLoaded, bytesTotal);
-            }
-        });
     }
 
 

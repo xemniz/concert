@@ -5,20 +5,24 @@ import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.model.VKApiAudio;
 import com.vk.sdk.api.model.VKList;
 
-import de.umass.lastfm.Artist;
 import ru.xmn.concert.JobExecutor;
 import ru.xmn.concert.model.api.LastfmApi;
 import ru.xmn.concert.model.api.RockGigApi;
+import ru.xmn.concert.model.api.VkApiBridge;
 import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.BandLastfm;
 import ru.xmn.concert.model.data.EventGig;
+import ru.xmn.concert.model.data.RockGigEvent;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 public class ConcertsModel {
     RockGigApi rockGigApi = new RockGigApi();
@@ -71,9 +75,9 @@ public class ConcertsModel {
 
     public Observable getArtistInfo(final String band) {
         return Observable
-                .create(new Observable.OnSubscribe<Band>() {
+                .create(new Observable.OnSubscribe<BandLastfm>() {
                     @Override
-                    public void call(Subscriber<? super Band> subscriber) {
+                    public void call(Subscriber<? super BandLastfm> subscriber) {
                         try {
                             subscriber.onNext(lastfmApi.getBandInfo(band));
                         } catch (IOException e) {
@@ -85,8 +89,35 @@ public class ConcertsModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public VKRequest bandList() {
-        return VKApi.audio().get();
+
+
+    public Observable<Set<Band>> getBandsGigsVk (){
+        Set<Band> gigsVkRockgig = new HashSet<Band>() {};
+        System.out.println("INCONCERTSMODEL");
+        VkApiBridge vkApiBridge = new VkApiBridge();
+        List<String> vkAudioList = vkApiBridge.bandList();
+        return rockGigApi.getEventsRockGig()
+                .flatMap(rockGigEvents -> {
+                    for (RockGigEvent event :
+                            rockGigEvents) {
+                        for (Band band :
+                                event.getBands()) {
+                            if (vkAudioList.contains(band.getBand().trim().toLowerCase())) {
+                                band.getGigs().add(event);
+                                System.out.println(band.getBand());
+                                gigsVkRockgig.add(band);
+                                try {
+                                    band.setBandImageUrl(lastfmApi.getBandInfo(band.getBand()).getImageUrl());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                    return Observable.just(gigsVkRockgig);
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 }
