@@ -97,7 +97,9 @@ public class ConcertsModel {
         VkApiBridge vkApiBridge = new VkApiBridge();
         List<String> vkAudioList = vkApiBridge.bandList();
         return rockGigApi.getEventsRockGig()
-                .flatMap(rockGigEvents -> {
+                .flatMap(rockGigEvents ->
+
+                {
                     for (RockGigEvent event :
                             rockGigEvents) {
                         for (Band band :

@@ -105,8 +105,8 @@ public class VkApiBridge {
                 .flatMap(vkResponse -> Observable.from((VKList<VKApiAudio>) vkResponse.parsedModel))
                 .flatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))
                 .distinct()
-                .map(s -> s.trim().toLowerCase()).subscribe(s -> gigs.add(s));
-//                .toList()
+                .map(s -> s.trim().toLowerCase())
+                .toList();
 //                .toBlocking()
 //                .single();
         return gigs;
