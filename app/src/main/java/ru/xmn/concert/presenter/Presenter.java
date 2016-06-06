@@ -71,10 +71,12 @@ public class Presenter {
         if (!subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
-        System.out.println("");
+        System.out.println("inPRESENTER");
 
         subscription = concertsModel
                 .getBandsGigsVk()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Set<Band>>() {
                     @Override
                     public void onCompleted() {

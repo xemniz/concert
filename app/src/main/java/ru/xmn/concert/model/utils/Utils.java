@@ -93,7 +93,7 @@ public class Utils {
     }
 
     public static String convertStreamToString(InputStream is) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "Cp1251"));
         StringBuilder sb = new StringBuilder();
         String line = null;
         while ((line = reader.readLine()) != null) {

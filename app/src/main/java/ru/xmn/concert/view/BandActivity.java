@@ -28,6 +28,7 @@ import com.squareup.picasso.Callback;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.List;
 
 import br.com.customsearchable.contract.CustomSearchableConstants;
@@ -51,10 +52,6 @@ public class BandActivity extends MvpAppCompatActivity implements BandView {
     private RecyclerView eventsRecView;
 
     private EventsAdapter adapter = new EventsAdapter();
-
-
-
-
 //        public static void navigate(AppCompatActivity activity, View transitionImage, ViewModel viewModel) {
 //        Intent intent = new Intent(activity, BandActivity.class);
 //        intent.putExtra(EXTRA_IMAGE, viewModel.getImage());
@@ -93,7 +90,11 @@ public class BandActivity extends MvpAppCompatActivity implements BandView {
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
 
         //get band info from API
-        presenter.getBandInfo(itemTitle);
+        try {
+            presenter.getBandInfo(itemTitle);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         presenter.getBandEvents(itemTitle);
 
         TextView title = (TextView) findViewById(R.id.title);

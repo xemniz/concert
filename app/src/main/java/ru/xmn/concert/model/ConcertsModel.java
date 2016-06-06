@@ -16,6 +16,7 @@ import ru.xmn.concert.model.data.RockGigEvent;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class ConcertsModel {
     }
 
     public Observable eventList(final String band) {
-        System.out.println(band+" in eventlist");
+        System.out.println(band + " in eventlist");
 
         return Observable
                 .create(new Observable.OnSubscribe<List<EventGig>>() {
@@ -73,53 +74,41 @@ public class ConcertsModel {
                 ;
     }
 
-    public Observable getArtistInfo(final String band) {
-        return Observable
-                .create(new Observable.OnSubscribe<BandLastfm>() {
-                    @Override
-                    public void call(Subscriber<? super BandLastfm> subscriber) {
-                        try {
-                            subscriber.onNext(lastfmApi.getBandInfo(band));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                })
+    public Observable getArtistInfo(final String band) throws IOException {
+        return lastfmApi.getBandInfo(band)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
 
-
-    public Observable<Set<Band>> getBandsGigsVk (){
-        Set<Band> gigsVkRockgig = new HashSet<Band>() {};
-        System.out.println("INCONCERTSMODEL");
+    public Observable<Set<Band>> getBandsGigsVk() {
+        Set<Band> gigsVkRockgig = new HashSet<Band>() {
+        };
+        System.out.println("INCONCERTSMODEL " + Thread.currentThread().getName());
         VkApiBridge vkApiBridge = new VkApiBridge();
-        List<String> vkAudioList = vkApiBridge.bandList();
-        return rockGigApi.getEventsRockGig()
-                .flatMap(rockGigEvents ->
-
-                {
-                    for (RockGigEvent event :
-                            rockGigEvents) {
-                        for (Band band :
-                                event.getBands()) {
-                            if (vkAudioList.contains(band.getBand().trim().toLowerCase())) {
+//        List<String> vkAudioList = vkApiBridge.bandList();
+        return Observable
+                .zip(vkApiBridge.bandList(), rockGigApi.getEventsRockGig(), (strings, rockGigEvents) -> {
+                    System.out.println("CONCMODEL COMBLATEST " + strings.size());
+                    for (RockGigEvent event : rockGigEvents) {
+                        for (Band band : event.getBands()) {
+                            if (strings.contains(band.getBand().trim().toLowerCase())) {
                                 band.getGigs().add(event);
                                 System.out.println(band.getBand());
                                 gigsVkRockgig.add(band);
                                 try {
-                                    band.setBandImageUrl(lastfmApi.getBandInfo(band.getBand()).getImageUrl());
+                                    System.out.println("CONCERTMODEL THREAD IS " + Thread.currentThread().getName());
+                                    lastfmApi.getBandInfo(band.getBand())
+                                            .subscribe(bandLastfm -> band.setBandImageUrl(bandLastfm.getImageUrl()));
+                                    System.out.println(band.getBandImageUrl());
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
                             }
                         }
                     }
-                    return Observable.just(gigsVkRockgig);
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                    System.out.println("CONCERTMODEL BEFORERETURN " + gigsVkRockgig.size());
+                    return gigsVkRockgig;
+                }).observeOn(Schedulers.io());
     }
-
 }

@@ -62,10 +62,10 @@ public class VkApiBridge {
 //
 //    }
 
-    public List<String> bandList() {
+    public Observable<List<String>> bandList() {
         List<String> gigs = new ArrayList<>();
-        System.out.println("INBANDLIST");
-        Observable
+        System.out.println("INVKApIBRIDGE THREAD IS "+Thread.currentThread().getName());
+        return Observable
                 .create(new Observable.OnSubscribe<VKResponse>() {
                     @Override
                     public void call(final Subscriber<? super VKResponse> subscriber) {
@@ -73,7 +73,7 @@ public class VkApiBridge {
                             @Override
                             public void onComplete(VKResponse response) {
                                 super.onComplete(response);
-                                System.out.println("INONCOMPLETE");
+                                System.out.println("INVKApIBRIDGE_INONCOMPLETE " +Thread.currentThread().getName());
                                 subscriber.onNext(response);
                                 subscriber.onCompleted();
 
@@ -102,6 +102,8 @@ public class VkApiBridge {
                         });
                     }
                 })
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
                 .flatMap(vkResponse -> Observable.from((VKList<VKApiAudio>) vkResponse.parsedModel))
                 .flatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))
                 .distinct()
@@ -109,7 +111,6 @@ public class VkApiBridge {
                 .toList();
 //                .toBlocking()
 //                .single();
-        return gigs;
     }
 
 }

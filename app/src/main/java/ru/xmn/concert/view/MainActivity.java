@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
             VKScope.MESSAGES,
             VKScope.DOCS,
             VKScope.AUDIO
-
     };
 
     @Override

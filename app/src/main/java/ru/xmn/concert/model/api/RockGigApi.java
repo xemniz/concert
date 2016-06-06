@@ -133,7 +133,6 @@ public class RockGigApi {
                 .build();
         Appfeed appfeed = builder.create(Appfeed.class);
         return appfeed.id()
-                .subscribeOn(Schedulers.io())
                 .map(s -> {
                     try {
                         return unZip(s);
@@ -159,10 +158,6 @@ public class RockGigApi {
             Utils.unpackArchive(new URL("http://rockgig.net/feed/appfeed" + feedId + ".zip"), file);
             System.out.println("download zip");
         }
-
         return Utils.getStringFromFile(unzipped.getPath());
     }
-
-
-
 }

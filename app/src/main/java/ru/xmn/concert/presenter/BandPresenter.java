@@ -3,6 +3,7 @@ package ru.xmn.concert.presenter;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 
+import java.io.IOException;
 import java.util.List;
 
 import ru.xmn.concert.model.ConcertsModel;
@@ -32,7 +33,7 @@ public class BandPresenter extends MvpPresenter<BandView> {
     ConcertsModel concertsModel = new ConcertsModel();
     private Subscription subscription = Subscriptions.empty();
 
-    public void getBandInfo (String band){
+    public void getBandInfo (String band) throws IOException {
         if (!subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
