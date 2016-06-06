@@ -3,6 +3,8 @@ package ru.xmn.concert.presenter;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.arellomobile.mvp.InjectViewState;
+import com.arellomobile.mvp.MvpPresenter;
 import com.vk.sdk.api.VKError;
 import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.VKResponse;
@@ -12,6 +14,7 @@ import com.vk.sdk.api.model.VKList;
 import ru.xmn.concert.model.ConcertsModel;
 import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
+import ru.xmn.concert.view.BandView;
 import ru.xmn.concert.view.MainView;
 import rx.Observable;
 import rx.Observer;
@@ -30,13 +33,15 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by xmn on 19.05.2016.
  */
-public class Presenter {
-    ConcertsModel concertsModel = new ConcertsModel();
-    private MainView mainView;
 
-    public Presenter(MainView mainView) {
-        this.mainView = mainView;
-    }
+@InjectViewState
+public class Presenter extends MvpPresenter<MainView> {
+    ConcertsModel concertsModel = new ConcertsModel();
+//    private MainView mainView;
+//
+//    public Presenter(MainView mainView) {
+//        this.mainView = mainView;
+//    }
 
     private Subscription subscription = Subscriptions.empty();
 
@@ -91,7 +96,7 @@ public class Presenter {
                     @Override
                     public void onNext(Set<Band> data) {
                         if (data != null && !data.isEmpty()) {
-                            mainView.showData(data);
+                            getViewState().showData(data);
                         } else {
                         }
                     }

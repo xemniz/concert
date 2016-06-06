@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.mikepenz.iconics.typeface.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
@@ -51,11 +52,12 @@ import ru.xmn.concert.view.fragments.FragmentThree;
 import ru.xmn.concert.view.fragments.FragmentTwo;
 import ru.xmn.concert.view.fragments.FragmentVkSettings;
 
-public class MainActivity extends AppCompatActivity implements MainView {
+public class MainActivity extends MvpAppCompatActivity implements MainView {
     private static final String VK_APP_ID = "c5ciaBldtbUggy09v9m1";
     private Drawer.Result drawerResult = null;
     private EventsAdapter adapter = new EventsAdapter();
-    private Presenter presenter = new Presenter(this);
+    @InjectPresenter
+    Presenter presenter;
     private SearchView searchView;
     RecyclerView recyclerView;
 
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        presenter = new Presenter(this);
+        presenter = new Presenter();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
