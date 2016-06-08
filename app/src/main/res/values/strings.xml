@@ -16,4 +16,11 @@
     <string name="priceAdapter">000</string>
     <string name="placeAdapter">Place</string>
     String <integer name="com_vk_sdk_AppId">5483358</integer>
+
+    <!-- Category -->
+    <string-array name="category">
+        <item>Все гиги</item>
+        <item>Избранные исполнители</item>
+        <item>Исполнители из вк</item>
+    </string-array>
 </resources>

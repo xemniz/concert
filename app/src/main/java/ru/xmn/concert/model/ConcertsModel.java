@@ -89,7 +89,7 @@ public class ConcertsModel {
 //        List<String> vkAudioList = vkApiBridge.bandList();
         return Observable
                 .zip(vkApiBridge.bandList(), rockGigApi.getEventsRockGig(), (strings, rockGigEvents) -> {
-                    System.out.println("CONCMODEL COMBLATEST " + strings.size());
+                    System.out.println("CONCMODEL COMBLATEST " + rockGigEvents.size());
                     for (RockGigEvent event : rockGigEvents) {
                         for (Band band : event.getBands()) {
                             if (strings.contains(band.getBand().trim().toLowerCase())) {

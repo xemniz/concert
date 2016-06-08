@@ -1,13 +1,11 @@
 package ru.xmn.concert.view;
 
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.presenter.InjectPresenter;
@@ -35,16 +36,11 @@ import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKError;
 
-import java.util.List;
 import java.util.Set;
 
-import br.com.customsearchable.contract.CustomSearchableConstants;
 import br.com.customsearchable.model.CustomSearchableInfo;
-import br.com.customsearchable.model.ResultItem;
 import ru.xmn.concert.R;
-import ru.xmn.concert.model.api.RockGigApi;
 import ru.xmn.concert.model.data.Band;
-import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.presenter.Presenter;
 import ru.xmn.concert.view.adapters.EventsAdapter;
 import ru.xmn.concert.view.fragments.FragmentVk;
@@ -84,21 +80,41 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
         //vk
         if (!VKSdk.wakeUpSession(this)) {
             VKSdk.login(this, sMyScope);
-        }
-        else
-        {
+        } else {
             presenter.bandList();
         }
 
         //Все для поиска
         CustomSearchableInfo.setTransparencyColor(Color.parseColor("#ccE3F2FD"));
-        Intent intent = getIntent();
-        handleIntent(intent);
+//        Intent intent = getIntent();
+//        handleIntent(intent);
 
         // Инициализируем Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //Инициализируем спиннер
+        String[] category = getResources().getStringArray(R.array.category);
+        SpinnerAdapter spinnerAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.category, R.layout.toolbar_spinner_item_dropdown);
+        Spinner navigationSpinner = new Spinner(getSupportActionBar().getThemedContext());
+        navigationSpinner.setAdapter(spinnerAdapter);
+        toolbar.addView(navigationSpinner, 0);
+
+        navigationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this,
+                        "you selected: " + category[position],
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         // Инициализируем Navigation Drawer
         drawerResult = new Drawer()
@@ -171,27 +187,26 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
 
-    // Handles the intent that carries user's choice in the Search Interface
-    private void handleIntent(Intent intent) {
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-
-            Log.i("Main", "Received query: " + query);
-        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            Bundle bundle = this.getIntent().getExtras();
-
-            assert (bundle != null);
-
-            if (bundle != null) {
-                ResultItem receivedItem = bundle.getParcelable(CustomSearchableConstants.CLICKED_RESULT_ITEM);
-
-                Log.i("RI.header", receivedItem.getHeader());
-                Log.i("RI.subHeader", receivedItem.getSubHeader());
-                Log.i("RI.leftIcon", receivedItem.getLeftIcon().toString());
-                Log.i("RI.rightIcon", receivedItem.getRightIcon().toString());
-            }
-        }
-    }
+//    // Handles the intent that carries user's choice in the Search Interface
+//    private void handleIntent(Intent intent) {
+//        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+//            String query = intent.getStringExtra(SearchManager.QUERY);
+//
+//            Log.i("Main", "Received query: " + query);
+//        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+//            Bundle bundle = this.getIntent().getExtras();
+//
+//            assert (bundle != null);
+//
+//            if (bundle != null) {
+//                ResultItem receivedItem = bundle.getParcelable(CustomSearchableConstants.CLICKED_RESULT_ITEM);
+//                Log.i("RI.header", receivedItem.getHeader());
+//                Log.i("RI.subHeader", receivedItem.getSubHeader());
+//                Log.i("RI.leftIcon", receivedItem.getLeftIcon().toString());
+//                Log.i("RI.rightIcon", receivedItem.getRightIcon().toString());
+//            }
+//        }
+//    }
 
 
     private void selectItem(int position) {
