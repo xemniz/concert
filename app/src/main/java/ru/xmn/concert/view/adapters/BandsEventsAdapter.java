@@ -33,8 +33,8 @@ public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.
         this.context = context;
     }
 
-    public void setGigList(Set<Band> repoList) {
-        this.bands.addAll(repoList);
+    public void setGigList(List<Band> repoList) {
+        this.bands = repoList;
         notifyDataSetChanged();
     }
 

@@ -112,5 +112,20 @@ public class Band {
         this.bandvk = bandvk;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Band band1 = (Band) o;
+
+        return band != null ? band.equals(band1.band) : band1.band == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return band != null ? band.hashCode() : 0;
+    }
 }
 

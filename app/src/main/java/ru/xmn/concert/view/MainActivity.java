@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -36,6 +37,7 @@ import com.vk.sdk.VKScope;
 import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKError;
 
+import java.util.List;
 import java.util.Set;
 
 import br.com.customsearchable.model.CustomSearchableInfo;
@@ -55,10 +57,11 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     @InjectPresenter
     Presenter presenter;
     private SearchView searchView;
-    RecyclerView recyclerView;
+    private RecyclerView recyclerView;
+    private AlertDialog mErrorDialog;
 
-    FragmentVk fragmentVk = new FragmentVk();
-    FragmentVkSettings fragmentVkSettings = new FragmentVkSettings();
+    private FragmentVk fragmentVk = new FragmentVk();
+    private FragmentVkSettings fragmentVkSettings = new FragmentVkSettings();
 
     private static final String[] sMyScope = new String[]{
             VKScope.FRIENDS,
@@ -114,6 +117,12 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
             }
         });
+
+        //Создание диалога для ошибки
+        mErrorDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.app_name)
+                .setOnCancelListener(dialog -> presenter.closeError())
+                .create();
 
 
         // Инициализируем Navigation Drawer
@@ -183,7 +192,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
         //Start fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().add(R.id.content_frame, fragmentVk).commit();
-        fragmentManager.beginTransaction().add(R.id.settings_frame, fragmentVkSettings).commit();
+//        fragmentManager.beginTransaction().add(R.id.settings_frame, fragmentVkSettings).commit();
     }
 
 
@@ -278,10 +287,61 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     @Override
-    public void showData(Set<Band> list) {
+    public void showData(List<Band> list) {
         FragmentVk fragmentVk = (FragmentVk) getSupportFragmentManager().findFragmentById(R.id.content_frame);
         fragmentVk.getAdapter().setGigList(list);
 //        fragmentVk.getAdapter().setGigList(list);
+    }
+
+    @Override
+    public void showError(String message) {
+        mErrorDialog.setMessage(message);
+        mErrorDialog.show();
+    }
+
+    @Override
+    public void hideError() {
+        mErrorDialog.hide();
+    }
+
+    @Override
+    public void onStartLoading() {
+
+    }
+
+    @Override
+    public void onFinishLoading() {
+
+    }
+
+    @Override
+    public void showRefreshing() {
+
+    }
+
+    @Override
+    public void hideRefreshing() {
+
+    }
+
+    @Override
+    public void showListProgress() {
+
+    }
+
+    @Override
+    public void hideListProgress() {
+
+    }
+
+    @Override
+    public void setBands(List<Band> bands, boolean maybeMore) {
+
+    }
+
+    @Override
+    public void addBands(List<Band> bands, boolean maybeMore) {
+
     }
 
     @Override

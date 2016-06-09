@@ -81,8 +81,8 @@ public class ConcertsModel {
     }
 
 
-    public Observable<Set<Band>> getBandsGigsVk() {
-        Set<Band> gigsVkRockgig = new HashSet<Band>() {
+    public Observable<List<Band>> getBandsGigsVk() {
+        List<Band> gigsVkRockgig = new ArrayList<Band>() {
         };
         System.out.println("INCONCERTSMODEL " + Thread.currentThread().getName());
         VkApiBridge vkApiBridge = new VkApiBridge();
@@ -93,9 +93,20 @@ public class ConcertsModel {
                     for (RockGigEvent event : rockGigEvents) {
                         for (Band band : event.getBands()) {
                             if (strings.contains(band.getBand().trim().toLowerCase())) {
-                                band.getGigs().add(event);
-                                System.out.println(band.getBand());
-                                gigsVkRockgig.add(band);
+
+                                boolean isBandInList = false;
+                                for (Band bandInList :
+                                        gigsVkRockgig) {
+                                    if (bandInList.equals(band)){
+                                        bandInList.getGigs().add(event);
+                                        isBandInList = true;
+                                    }
+                                }
+                                if (!isBandInList){
+                                    band.getGigs().add(event);
+                                    gigsVkRockgig.add(band);
+                                }
+
                                 try {
                                     System.out.println("CONCERTMODEL THREAD IS " + Thread.currentThread().getName());
                                     lastfmApi.getBandInfo(band.getBand())

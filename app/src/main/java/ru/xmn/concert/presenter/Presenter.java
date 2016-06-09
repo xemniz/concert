@@ -37,40 +37,8 @@ import java.util.concurrent.TimeUnit;
 @InjectViewState
 public class Presenter extends MvpPresenter<MainView> {
     ConcertsModel concertsModel = new ConcertsModel();
-//    private MainView mainView;
-//
-//    public Presenter(MainView mainView) {
-//        this.mainView = mainView;
-//    }
 
     private Subscription subscription = Subscriptions.empty();
-
-//    public void eventList(String band) {
-//        if (!subscription.isUnsubscribed()) {
-//            subscription.unsubscribe();
-//        }
-//
-//        subscription = concertsModel.eventList(band)
-//                .subscribe(new Observer<List<EventGig>>() {
-//                    @Override
-//                    public void onCompleted() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    @Override
-//                    public void onNext(List<EventGig> data) {
-//                        if (data != null && !data.isEmpty()) {
-//                            mainView.showData(data);
-//                        } else {
-//                        }
-//                    }
-//                });
-//    }
 
     public void bandList() {
         if (!subscription.isUnsubscribed()) {
@@ -82,26 +50,25 @@ public class Presenter extends MvpPresenter<MainView> {
                 .getBandsGigsVk()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Set<Band>>() {
+                .subscribe(new Observer<List<Band>>() {
                     @Override
-                    public void onCompleted() {
-
-                    }
-
+                    public void onCompleted() {}
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
                     }
-
                     @Override
-                    public void onNext(Set<Band> data) {
+                    public void onNext(List<Band> data) {
                         if (data != null && !data.isEmpty()) {
                             getViewState().showData(data);
-                        } else {
                         }
                     }
                 });
     }
 
 
+    public void closeError()
+    {
+        getViewState().hideError();
+    }
 }
