@@ -12,30 +12,35 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import ru.xmn.concert.R;
 import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.model.data.RockGigEvent;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by xmn on 01.06.2016.
  */
 
-public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.ViewHolder> {
+public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.ViewHolder> {
 
-    private List<Band> bands = new ArrayList<>();
+    private List<RockGigEvent> gigs = new ArrayList<>();
     private Context context;
 
-    public BandsEventsAdapter(Context context) {
+    public EventsBandsAdapter(Context context) {
         this.context = context;
 
     }
 
-    public void setBands(List<Band> repoList) {
-        bands.addAll(repoList);
+    public void setGigs(List<RockGigEvent> repoList) {
+        gigs.addAll(repoList);
         notifyDataSetChanged();
     }
 
@@ -49,28 +54,39 @@ public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
-        Band band = bands.get(i);
-        viewHolder.name.setText(band.getBand());
-        RockGigEvent event = band.getGigs().get(0);
-        viewHolder.date.setText(event.getDate()+", "+event.getTime()+", "+event.getPrice());
-        if (band.getGigs().size()>1)
-            viewHolder.place.setText(event.getPlace().getName()+" - "+event.getName()+" +"+ (band.getGigs().size()-1));
-        else
-            viewHolder.place.setText(event.getPlace().getName()+" - "+event.getName());
+        RockGigEvent event = gigs.get(i);
+        viewHolder.place.setText(event.getPlace().getName() + " - " + event.getName());
+        viewHolder.date.setText(event.getDate() + ", " + event.getTime() + ", " + event.getPrice());
 
-        Picasso.with(context)
-                .load(band.getBandImageUrl())
-                .into(viewHolder.image);
+        Observable<Band> changeView = Observable
+                .just(event.getBands())
+                .flatMap(bands -> {
+                    Collections.shuffle(bands);
+                    return Observable.from(bands);
+                });
+
+        Observable.zip(
+                changeView,
+                Observable.interval(4, TimeUnit.SECONDS),
+                (band, aLong) -> band)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(band -> {
+                    Picasso.with(context)
+                            .load(band.getBandImageUrl())
+                            .into(viewHolder.image);
+                    viewHolder.name.setText(band.getBand());
+                });
     }
 
     @Override
     public int getItemCount() {
-        return bands.size();
+        return gigs.size();
     }
 
-    public void addBands(List<Band> bands) {
+    public void addGigs(List<RockGigEvent> gigs) {
 
-        this.bands.addAll(bands);
+        this.gigs.addAll(gigs);
         notifyDataSetChanged();
     }
 
@@ -90,14 +106,15 @@ public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.
         }
 
     }
-    public void add(Band gig, int position) {
-        bands.add(position, gig);
+
+    public void add(RockGigEvent gig, int position) {
+        gigs.add(position, gig);
         notifyItemInserted(position);
     }
 
     public void remove(EventGig gig) {
-        int position = bands.indexOf(gig);
-        bands.remove(position);
+        int position = gigs.indexOf(gig);
+        gigs.remove(position);
         notifyItemRemoved(position);
     }
 }

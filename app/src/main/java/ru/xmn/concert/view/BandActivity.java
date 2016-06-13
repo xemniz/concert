@@ -38,6 +38,7 @@ import ru.xmn.concert.model.data.BandLastfm;
 import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.presenter.BandPresenter;
 import ru.xmn.concert.view.adapters.EventsAdapter;
+import ru.xmn.concert.view.common.MvpAppCompatActivity;
 
 public class BandActivity extends MvpAppCompatActivity implements BandView {
     @InjectPresenter

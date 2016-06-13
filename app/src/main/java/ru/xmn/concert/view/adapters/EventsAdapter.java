@@ -36,7 +36,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
         EventGig eventGig = eventGigs.get(i);
-//        viewHolder.name.setText(eventGig.getName());
         viewHolder.name.setText(eventGig.getRequestBand());
         viewHolder.date.setText(eventGig.getDate()+", "+eventGig.getTime()+", "+eventGig.getPrice());
         viewHolder.place.setText(eventGig.getPlace());

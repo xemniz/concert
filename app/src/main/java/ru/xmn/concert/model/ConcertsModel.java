@@ -29,6 +29,7 @@ public class ConcertsModel {
     RockGigApi rockGigApi = new RockGigApi();
     LastfmApi lastfmApi = new LastfmApi();
     VKList<VKApiAudio> list;
+    List<Band> gigsVkRockgig = new ArrayList<>();
 
     public VKList<VKApiAudio> getList() {
         return list;
@@ -81,12 +82,15 @@ public class ConcertsModel {
     }
 
 
-    public Observable<List<Band>> getBandsGigsVk() {
-        List<Band> gigsVkRockgig = new ArrayList<Band>() {
-        };
-        System.out.println("INCONCERTSMODEL " + Thread.currentThread().getName());
+    public Observable<List<Band>> getBandsGigsVk(boolean isRefreshing) {
+
+        System.out.println("INCONCERTSMODEL " + Thread.currentThread().getName() + " gigsVkRockgig " + gigsVkRockgig.size());
         VkApiBridge vkApiBridge = new VkApiBridge();
 //        List<String> vkAudioList = vkApiBridge.bandList();
+        List<Band> tmpGigsVkRockGig = new ArrayList<>();
+        tmpGigsVkRockGig.addAll(gigsVkRockgig);
+        if (isRefreshing) {
+        gigsVkRockgig = new ArrayList<Band>() {};
         return Observable
                 .zip(vkApiBridge.bandList(), rockGigApi.getEventsRockGig(), (strings, rockGigEvents) -> {
                     System.out.println("CONCMODEL COMBLATEST " + rockGigEvents.size());
@@ -111,7 +115,6 @@ public class ConcertsModel {
                                     System.out.println("CONCERTMODEL THREAD IS " + Thread.currentThread().getName());
                                     lastfmApi.getBandInfo(band.getBand())
                                             .subscribe(bandLastfm -> band.setBandImageUrl(bandLastfm.getImageUrl()));
-                                    System.out.println(band.getBandImageUrl());
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -121,5 +124,9 @@ public class ConcertsModel {
                     System.out.println("CONCERTMODEL BEFORERETURN " + gigsVkRockgig.size());
                     return gigsVkRockgig;
                 }).observeOn(Schedulers.io());
+        } else {
+            return Observable.just(tmpGigsVkRockGig);
+        }
+
     }
 }

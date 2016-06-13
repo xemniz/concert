@@ -38,24 +38,23 @@ import com.vk.sdk.VKSdk;
 import com.vk.sdk.api.VKError;
 
 import java.util.List;
-import java.util.Set;
 
 import br.com.customsearchable.model.CustomSearchableInfo;
 import ru.xmn.concert.R;
 import ru.xmn.concert.model.data.Band;
-import ru.xmn.concert.presenter.Presenter;
+import ru.xmn.concert.presenter.MainPresenter;
 import ru.xmn.concert.view.adapters.EventsAdapter;
+import ru.xmn.concert.view.common.MvpAppCompatActivity;
 import ru.xmn.concert.view.fragments.FragmentVk;
 import ru.xmn.concert.view.fragments.FragmentThree;
 import ru.xmn.concert.view.fragments.FragmentTwo;
 import ru.xmn.concert.view.fragments.FragmentVkSettings;
 
 public class MainActivity extends MvpAppCompatActivity implements MainView {
+    @InjectPresenter
+    MainPresenter presenter;
     private static final String VK_APP_ID = "c5ciaBldtbUggy09v9m1";
     private Drawer.Result drawerResult = null;
-    private EventsAdapter adapter = new EventsAdapter();
-    @InjectPresenter
-    Presenter presenter;
     private SearchView searchView;
     private RecyclerView recyclerView;
     private AlertDialog mErrorDialog;
@@ -76,21 +75,15 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        presenter = new Presenter();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         //vk
-        if (!VKSdk.wakeUpSession(this)) {
-            VKSdk.login(this, sMyScope);
-        } else {
-            presenter.bandList();
-        }
+        if (!VKSdk.wakeUpSession(this)) VKSdk.login(this, sMyScope);
+        else startVkFragment();
 
         //Все для поиска
         CustomSearchableInfo.setTransparencyColor(Color.parseColor("#ccE3F2FD"));
-//        Intent intent = getIntent();
-//        handleIntent(intent);
 
         // Инициализируем Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -189,34 +182,8 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
                 })
                 .build();
 
-        //Start fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.content_frame, fragmentVk).commit();
-//        fragmentManager.beginTransaction().add(R.id.settings_frame, fragmentVkSettings).commit();
+
     }
-
-
-//    // Handles the intent that carries user's choice in the Search Interface
-//    private void handleIntent(Intent intent) {
-//        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-//            String query = intent.getStringExtra(SearchManager.QUERY);
-//
-//            Log.i("Main", "Received query: " + query);
-//        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-//            Bundle bundle = this.getIntent().getExtras();
-//
-//            assert (bundle != null);
-//
-//            if (bundle != null) {
-//                ResultItem receivedItem = bundle.getParcelable(CustomSearchableConstants.CLICKED_RESULT_ITEM);
-//                Log.i("RI.header", receivedItem.getHeader());
-//                Log.i("RI.subHeader", receivedItem.getSubHeader());
-//                Log.i("RI.leftIcon", receivedItem.getLeftIcon().toString());
-//                Log.i("RI.rightIcon", receivedItem.getRightIcon().toString());
-//            }
-//        }
-//    }
-
 
     private void selectItem(int position) {
         // Update the main content by replacing fragments
@@ -288,9 +255,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     @Override
     public void showData(List<Band> list) {
-        FragmentVk fragmentVk = (FragmentVk) getSupportFragmentManager().findFragmentById(R.id.content_frame);
-        fragmentVk.getAdapter().setGigList(list);
-//        fragmentVk.getAdapter().setGigList(list);
     }
 
     @Override
@@ -305,63 +269,35 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     @Override
-    public void onStartLoading() {
+    public void setFragment() {
 
     }
 
-    @Override
-    public void onFinishLoading() {
-
-    }
-
-    @Override
-    public void showRefreshing() {
-
-    }
-
-    @Override
-    public void hideRefreshing() {
-
-    }
-
-    @Override
-    public void showListProgress() {
-
-    }
-
-    @Override
-    public void hideListProgress() {
-
-    }
-
-    @Override
-    public void setBands(List<Band> bands, boolean maybeMore) {
-
-    }
-
-    @Override
-    public void addBands(List<Band> bands, boolean maybeMore) {
-
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         VKCallback<VKAccessToken> callback = new VKCallback<VKAccessToken>() {
             @Override
             public void onResult(VKAccessToken res) {
+                startVkFragment();
                 // User passed Authorization
-                System.out.println("VKTEST123");
-                presenter.bandList();
             }
 
             @Override
             public void onError(VKError error) {
-                // User didn't pass Authorization
+                showError(error.errorMessage);
             }
         };
 
         if (!VKSdk.onActivityResult(requestCode, resultCode, data, callback)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private void startVkFragment() {
+        //Start fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().add(R.id.content_frame, fragmentVk).commit();
+//        fragmentManager.beginTransaction().add(R.id.settings_frame, fragmentVkSettings).commit();
     }
 }
