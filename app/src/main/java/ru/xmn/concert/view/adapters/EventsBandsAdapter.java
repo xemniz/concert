@@ -54,6 +54,7 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
+        viewHolder.image.setImageDrawable(null);
         RockGigEvent event = gigs.get(i);
         viewHolder.place.setText(event.getPlace().getName() + " - " + event.getName());
         viewHolder.date.setText(event.getDate() + ", " + event.getTime() + ", " + event.getPrice());
