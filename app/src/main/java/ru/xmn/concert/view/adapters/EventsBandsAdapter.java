@@ -57,6 +57,19 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
         RockGigEvent event = gigs.get(i);
         viewHolder.place.setText(event.getPlace().getName() + " - " + event.getName());
         viewHolder.date.setText(event.getDate() + ", " + event.getTime() + ", " + event.getPrice());
+        if (event.getBands().size()>0) {
+            Band defaultBand = event.getBands().get(0);
+            Picasso.with(context)
+                    .load(defaultBand.getBandImageUrl())
+                    .into(viewHolder.image);
+            viewHolder.name.setText(defaultBand.getBand());
+        } else
+        {
+            Picasso.with(context)
+                    .load("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg")
+                    .into(viewHolder.image);
+            viewHolder.name.setText("");
+        }
 
         Observable<Band> changeView = Observable
                 .just(event.getBands())
@@ -64,6 +77,7 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
                     Collections.shuffle(bands);
                     return Observable.from(bands);
                 });
+
 
         Observable.zip(
                 changeView,
@@ -88,6 +102,11 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
 
         this.gigs.addAll(gigs);
         notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

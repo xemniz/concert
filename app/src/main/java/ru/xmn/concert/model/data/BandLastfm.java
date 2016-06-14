@@ -5,7 +5,7 @@ package ru.xmn.concert.model.data;
  */
 
 public class BandLastfm {
-    private String imageUrl;
+    private String imageUrl = "http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg";
     private String wiki;
     private String name;
 

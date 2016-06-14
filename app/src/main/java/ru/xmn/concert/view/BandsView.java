@@ -11,6 +11,7 @@ import java.util.Set;
 
 import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
+import ru.xmn.concert.model.data.RockGigEvent;
 
 
 @StateStrategyType(SingleStateStrategy.class)
@@ -37,4 +38,9 @@ public interface BandsView extends MvpView {
 
     @StateStrategyType(AddToEndStrategy.class)
     void addBands(List<Band> bands);
+
+    void setGigs(List<RockGigEvent> bands);
+
+    @StateStrategyType(AddToEndStrategy.class)
+    void addGigs(List<RockGigEvent> bands);
 }

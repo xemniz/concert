@@ -129,4 +129,30 @@ public class ConcertsModel {
         }
 
     }
+
+    public Observable<List<RockGigEvent>> getAllRockGigEvents (int PAGE, int IT_ON_PAGE) {
+        return rockGigApi.getEventsRockGig()
+                .flatMap(rockGigEvents -> Observable.from(rockGigEvents))
+                .skip(IT_ON_PAGE*PAGE)
+                .take(IT_ON_PAGE)
+                .map(rockGigEvent -> {
+                    for (Band band: rockGigEvent.getBands()) {
+                        try {
+                            lastfmApi.getBandInfo(band.getBand())
+                                    .subscribe(bandLastfm -> {band.setBandImageUrl(bandLastfm.getImageUrl());
+                                        System.out.println("BAND URL ." + bandLastfm.getImageUrl()+".");
+                                        if (band.getBandImageUrl().length()<3&&band.getBandImageUrl().equals("")) {
+                                            band.setBandImageUrl("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg");
+                                        }
+                                        System.out.println("BAND URL " + bandLastfm.getImageUrl());
+                                    });
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            band.setBandImageUrl("http://p4cdn4static.sharpschool.com/UserFiles/Servers/Server_91869/Image/Band4.jpg");
+                        }
+                    }
+                    return rockGigEvent;
+                })
+                .toList();
+    }
 }

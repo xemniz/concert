@@ -14,16 +14,19 @@ import java.util.List;
 
 import ru.xmn.concert.R;
 import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.RockGigEvent;
 import ru.xmn.concert.presenter.PresenterVkFragment;
 import ru.xmn.concert.view.BandsView;
 import ru.xmn.concert.view.adapters.BandsEventsAdapter;
 import ru.xmn.concert.view.adapters.EndlessRecyclerViewScrollListener;
+import ru.xmn.concert.view.adapters.EventsBandsAdapter;
 import ru.xmn.concert.view.common.MvpAppCompatFragment;
 
 public class FragmentVk extends MvpAppCompatFragment implements BandsView {
     @InjectPresenter
     PresenterVkFragment presenter;
-    private BandsEventsAdapter adapter;
+    private BandsEventsAdapter bandsEventsAdapter;
+    private EventsBandsAdapter eventsBandsAdapter;
 
     public FragmentVk() {
     }
@@ -34,14 +37,15 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(linearLayoutManager);
-        adapter = new BandsEventsAdapter(this.getContext());
-        recyclerView.setAdapter(adapter);
+        bandsEventsAdapter = new BandsEventsAdapter(this.getContext());
+        eventsBandsAdapter = new EventsBandsAdapter(this.getContext());
+//        recyclerView.setAdapter(bandsEventsAdapter);
+        recyclerView.setAdapter(eventsBandsAdapter);
         recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
-                // Triggered only when new data needs to be appended to the list
-                // Add whatever code is needed to append new items to the bottom of the list
-                presenter.bandList(page);
+//                presenter.bandList(page);
+                presenter.eventList(page);
             }
         });
 
@@ -95,11 +99,21 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
 
     @Override
     public void setBands(List<Band> bands) {
-        adapter.setBands(bands);
+        bandsEventsAdapter.setBands(bands);
     }
 
     @Override
     public void addBands(List<Band> bands) {
-        adapter.addBands(bands);
+        bandsEventsAdapter.addBands(bands);
+    }
+
+    @Override
+    public void setGigs(List<RockGigEvent> gigs) {
+        eventsBandsAdapter.setGigs(gigs);
+    }
+
+    @Override
+    public void addGigs(List<RockGigEvent> gigs) {
+        eventsBandsAdapter.addGigs(gigs);
     }
 }

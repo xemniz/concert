@@ -21,6 +21,9 @@ public class LastfmApi {
                 .flatMap(artist -> Observable.just(new BandLastfm(artist.getName(),
                         artist.getWikiSummary(),
                         artist.getImageURL(ImageSize.EXTRALARGE))))
+                .onErrorResumeNext(throwable -> Observable.just(new BandLastfm(bandName,
+                        " ",
+                        "http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg")))
                 ;
     }
 }

@@ -5,6 +5,7 @@ import com.arellomobile.mvp.MvpPresenter;
 
 import ru.xmn.concert.model.ConcertsModel;
 import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.RockGigEvent;
 import ru.xmn.concert.view.BandsView;
 import rx.Observer;
 import rx.Subscription;
@@ -22,41 +23,37 @@ import java.util.List;
 @InjectViewState
 public class PresenterVkFragment extends MvpPresenter<BandsView> {
     ConcertsModel concertsModel = new ConcertsModel();
-    final int PAGE_SIZE = 10;
+    final int PAGE_SIZE = 15;
     private Subscription subscription = Subscriptions.empty();
 
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        if (!subscription.isUnsubscribed()) {
-            subscription.unsubscribe();
-        }
+        eventList(0);
 
-
-        subscription = concertsModel
-                .getBandsGigsVk(true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(bands -> bands.subList(0, PAGE_SIZE))
-
-                .subscribe(new Observer<List<Band>>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        getViewState().showError(e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(List<Band> data) {
-                        if (data != null && !data.isEmpty()) {
-                            getViewState().setBands(data);
-                        }
-                    }
-                });
+//        subscription = concertsModel
+//                .getBandsGigsVk(true)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .map(bands -> bands.subList(0, PAGE_SIZE))
+//                .subscribe(new Observer<List<Band>>() {
+//                    @Override
+//                    public void onCompleted() {
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        e.printStackTrace();
+//                        getViewState().showError(e.getMessage());
+//                    }
+//
+//                    @Override
+//                    public void onNext(List<Band> data) {
+//                        if (data != null && !data.isEmpty()) {
+//                            getViewState().setBands(data);
+//                        }
+//                    }
+//                });
 
     }
 
@@ -99,6 +96,31 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
                 });
     }
 
+    public void eventList (int page) {
+        if (!subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+        }
+        subscription = concertsModel
+                .getAllRockGigEvents(page+1, PAGE_SIZE)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<RockGigEvent>>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        getViewState().showError(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(List<RockGigEvent> rockGigEvents) {
+                        getViewState().addGigs(rockGigEvents);
+                    }
+                });
+    }
 
     public void closeError() {
         getViewState().hideError();
