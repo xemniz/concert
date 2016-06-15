@@ -1,22 +1,19 @@
 package ru.xmn.concert.view;
 
 import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SingleStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import java.util.List;
-import java.util.Set;
 
-import ru.xmn.concert.model.data.Band;
-import ru.xmn.concert.model.data.EventGig;
-import ru.xmn.concert.model.data.RockGigEvent;
+import ru.xmn.concert.model.data.BandRockGig;
+import ru.xmn.concert.model.data.EventRockGig;
 
 
 @StateStrategyType(SingleStateStrategy.class)
 public interface BandsView extends MvpView {
-    public void showData(List<Band> list);
+    public void showData(List<BandRockGig> list);
 
     void showError(String message);
 
@@ -34,13 +31,13 @@ public interface BandsView extends MvpView {
 
     void hideListProgress();
 
-    void setBands(List<Band> bands);
+    void setBands(List<BandRockGig> bandRockGigs);
 
     @StateStrategyType(AddToEndStrategy.class)
-    void addBands(List<Band> bands);
+    void addBands(List<BandRockGig> bandRockGigs);
 
-    void setGigs(List<RockGigEvent> bands);
+    void setGigs(List<EventRockGig> bands);
 
     @StateStrategyType(AddToEndStrategy.class)
-    void addGigs(List<RockGigEvent> bands);
+    void addGigs(List<EventRockGig> bands);
 }

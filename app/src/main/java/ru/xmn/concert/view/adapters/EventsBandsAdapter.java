@@ -17,12 +17,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import ru.xmn.concert.R;
-import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.BandRockGig;
 import ru.xmn.concert.model.data.EventGig;
-import ru.xmn.concert.model.data.RockGigEvent;
+import ru.xmn.concert.model.data.EventRockGig;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 /**
@@ -31,7 +30,7 @@ import rx.schedulers.Schedulers;
 
 public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.ViewHolder> {
 
-    private List<RockGigEvent> gigs = new ArrayList<>();
+    private List<EventRockGig> gigs = new ArrayList<>();
     private Context context;
 
     public EventsBandsAdapter(Context context) {
@@ -39,7 +38,7 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
 
     }
 
-    public void setGigs(List<RockGigEvent> repoList) {
+    public void setGigs(List<EventRockGig> repoList) {
         gigs.addAll(repoList);
         notifyDataSetChanged();
     }
@@ -55,15 +54,15 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
         viewHolder.image.setImageDrawable(null);
-        RockGigEvent event = gigs.get(i);
+        EventRockGig event = gigs.get(i);
         viewHolder.place.setText(event.getPlace().getName() + " - " + event.getName());
         viewHolder.date.setText(event.getDate() + ", " + event.getTime() + ", " + event.getPrice());
-        if (event.getBands().size()>0) {
-            Band defaultBand = event.getBands().get(0);
+        if (event.getBandRockGigs().size()>0) {
+            BandRockGig defaultBandRockGig = event.getBandRockGigs().get(0);
             Picasso.with(context)
-                    .load(defaultBand.getBandImageUrl())
+                    .load(defaultBandRockGig.getBandImageUrl())
                     .into(viewHolder.image);
-            viewHolder.name.setText(defaultBand.getBand());
+            viewHolder.name.setText(defaultBandRockGig.getBand());
         } else
         {
             Picasso.with(context)
@@ -72,8 +71,8 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
             viewHolder.name.setText("");
         }
 
-        Observable<Band> changeView = Observable
-                .just(event.getBands())
+        Observable<BandRockGig> changeView = Observable
+                .just(event.getBandRockGigs())
                 .flatMap(bands -> {
                     Collections.shuffle(bands);
                     return Observable.from(bands);
@@ -99,7 +98,7 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
         return gigs.size();
     }
 
-    public void addGigs(List<RockGigEvent> gigs) {
+    public void addGigs(List<EventRockGig> gigs) {
 
         this.gigs.addAll(gigs);
         notifyDataSetChanged();
@@ -127,7 +126,7 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
 
     }
 
-    public void add(RockGigEvent gig, int position) {
+    public void add(EventRockGig gig, int position) {
         gigs.add(position, gig);
         notifyItemInserted(position);
     }

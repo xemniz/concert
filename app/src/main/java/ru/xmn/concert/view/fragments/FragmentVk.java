@@ -13,8 +13,8 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import java.util.List;
 
 import ru.xmn.concert.R;
-import ru.xmn.concert.model.data.Band;
-import ru.xmn.concert.model.data.RockGigEvent;
+import ru.xmn.concert.model.data.BandRockGig;
+import ru.xmn.concert.model.data.EventRockGig;
 import ru.xmn.concert.presenter.PresenterVkFragment;
 import ru.xmn.concert.view.BandsView;
 import ru.xmn.concert.view.adapters.BandsEventsAdapter;
@@ -53,7 +53,7 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
     }
 
     @Override
-    public void showData(List<Band> list) {
+    public void showData(List<BandRockGig> list) {
 
     }
 
@@ -98,22 +98,22 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
     }
 
     @Override
-    public void setBands(List<Band> bands) {
-        bandsEventsAdapter.setBands(bands);
+    public void setBands(List<BandRockGig> bandRockGigs) {
+        bandsEventsAdapter.setBandRockGigs(bandRockGigs);
     }
 
     @Override
-    public void addBands(List<Band> bands) {
-        bandsEventsAdapter.addBands(bands);
+    public void addBands(List<BandRockGig> bandRockGigs) {
+        bandsEventsAdapter.addBands(bandRockGigs);
     }
 
     @Override
-    public void setGigs(List<RockGigEvent> gigs) {
+    public void setGigs(List<EventRockGig> gigs) {
         eventsBandsAdapter.setGigs(gigs);
     }
 
     @Override
-    public void addGigs(List<RockGigEvent> gigs) {
+    public void addGigs(List<EventRockGig> gigs) {
         eventsBandsAdapter.addGigs(gigs);
     }
 }

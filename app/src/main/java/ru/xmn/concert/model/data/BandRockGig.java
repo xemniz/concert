@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Band {
+public class BandRockGig {
 
     @SerializedName("bandid")
     @Expose
@@ -21,7 +21,7 @@ public class Band {
     @Expose
     private String bandvk;
 
-    private List<RockGigEvent> gigs = new ArrayList<>();
+    private List<EventRockGig> gigs = new ArrayList<>();
     private String bandImageUrl;
 
     public String getBandImageUrl() {
@@ -32,11 +32,11 @@ public class Band {
         this.bandImageUrl = bandImageUrl;
     }
 
-    public List<RockGigEvent> getGigs() {
+    public List<EventRockGig> getGigs() {
         return gigs;
     }
 
-    public void setGigs(List<RockGigEvent> gigs) {
+    public void setGigs(List<EventRockGig> gigs) {
         this.gigs = gigs;
     }
 
@@ -117,9 +117,9 @@ public class Band {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Band band1 = (Band) o;
+        BandRockGig bandRockGig1 = (BandRockGig) o;
 
-        return band != null ? band.equals(band1.band) : band1.band == null;
+        return band != null ? band.equals(bandRockGig1.band) : bandRockGig1.band == null;
 
     }
 

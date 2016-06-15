@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class RockGigEvent {
+public class EventRockGig {
 
     @SerializedName("eventid")
     @Expose
@@ -34,9 +34,9 @@ public class RockGigEvent {
     @SerializedName("place")
     @Expose
     private Place place;
-    @SerializedName("bands")
+    @SerializedName("bandRockGigs")
     @Expose
-    private List<Band> bands = new ArrayList<Band>();
+    private List<BandRockGig> bandRockGigs = new ArrayList<BandRockGig>();
 
     /**
      *
@@ -203,19 +203,19 @@ public class RockGigEvent {
     /**
      *
      * @return
-     * The bands
+     * The bandRockGigs
      */
-    public List<Band> getBands() {
-        return bands;
+    public List<BandRockGig> getBandRockGigs() {
+        return bandRockGigs;
     }
 
     /**
      *
-     * @param bands
-     * The bands
+     * @param bandRockGigs
+     * The bandRockGigs
      */
-    public void setBands(List<Band> bands) {
-        this.bands = bands;
+    public void setBandRockGigs(List<BandRockGig> bandRockGigs) {
+        this.bandRockGigs = bandRockGigs;
     }
 
 }

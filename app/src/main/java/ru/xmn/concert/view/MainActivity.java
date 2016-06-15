@@ -41,9 +41,8 @@ import java.util.List;
 
 import br.com.customsearchable.model.CustomSearchableInfo;
 import ru.xmn.concert.R;
-import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.BandRockGig;
 import ru.xmn.concert.presenter.MainPresenter;
-import ru.xmn.concert.view.adapters.EventsAdapter;
 import ru.xmn.concert.view.common.MvpAppCompatActivity;
 import ru.xmn.concert.view.fragments.FragmentVk;
 import ru.xmn.concert.view.fragments.FragmentThree;
@@ -254,7 +253,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     @Override
-    public void showData(List<Band> list) {
+    public void showData(List<BandRockGig> list) {
     }
 
     @Override

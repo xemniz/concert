@@ -1,45 +1,24 @@
 package ru.xmn.concert.model.api;
 
-import android.content.Context;
-import android.provider.MediaStore;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import de.umass.lastfm.Artist;
-import de.umass.lastfm.ImageSize;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 import ru.xmn.concert.Application;
-import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
-import ru.xmn.concert.model.data.RockGigEvent;
+import ru.xmn.concert.model.data.EventRockGig;
 import ru.xmn.concert.model.utils.Utils;
 import rx.Observable;
-import rx.schedulers.Schedulers;
 
 
 public class RockGigApi {
@@ -124,7 +103,7 @@ public class RockGigApi {
         return bandsList;
     }
 
-    public Observable<List<RockGigEvent>> getEventsRockGig() {
+    public Observable<List<EventRockGig>> getEventsRockGig() {
         System.out.println("INROCKGIGAPI");
         Retrofit builder = new Retrofit.Builder()
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -143,10 +122,10 @@ public class RockGigApi {
                 })
                 .flatMap(s -> {
                     Gson gson = new Gson();
-                    Type listType = new TypeToken<ArrayList<RockGigEvent>>() {
+                    Type listType = new TypeToken<ArrayList<EventRockGig>>() {
                     }.getType();
-                    List<RockGigEvent> rockGigEvents = gson.fromJson(s, listType);
-                    return Observable.just(rockGigEvents);
+                    List<EventRockGig> eventRockGigs = gson.fromJson(s, listType);
+                    return Observable.just(eventRockGigs);
                 });
     }
 

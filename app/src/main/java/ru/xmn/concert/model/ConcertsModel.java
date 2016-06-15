@@ -1,7 +1,5 @@
 package ru.xmn.concert.model;
 
-import com.vk.sdk.api.VKApi;
-import com.vk.sdk.api.VKRequest;
 import com.vk.sdk.api.model.VKApiAudio;
 import com.vk.sdk.api.model.VKList;
 
@@ -9,27 +7,23 @@ import ru.xmn.concert.JobExecutor;
 import ru.xmn.concert.model.api.LastfmApi;
 import ru.xmn.concert.model.api.RockGigApi;
 import ru.xmn.concert.model.api.VkApiBridge;
-import ru.xmn.concert.model.data.Band;
-import ru.xmn.concert.model.data.BandLastfm;
+import ru.xmn.concert.model.data.BandRockGig;
 import ru.xmn.concert.model.data.EventGig;
-import ru.xmn.concert.model.data.RockGigEvent;
+import ru.xmn.concert.model.data.EventRockGig;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ConcertsModel {
     RockGigApi rockGigApi = new RockGigApi();
     LastfmApi lastfmApi = new LastfmApi();
     VKList<VKApiAudio> list;
-    List<Band> gigsVkRockgig = new ArrayList<>();
+    List<BandRockGig> gigsVkRockgig = new ArrayList<>();
 
     public VKList<VKApiAudio> getList() {
         return list;
@@ -82,39 +76,39 @@ public class ConcertsModel {
     }
 
 
-    public Observable<List<Band>> getBandsGigsVk(boolean isRefreshing) {
+    public Observable<List<BandRockGig>> getBandsGigsVk(boolean isRefreshing) {
 
         System.out.println("INCONCERTSMODEL " + Thread.currentThread().getName() + " gigsVkRockgig " + gigsVkRockgig.size());
         VkApiBridge vkApiBridge = new VkApiBridge();
 //        List<String> vkAudioList = vkApiBridge.bandList();
-        List<Band> tmpGigsVkRockGig = new ArrayList<>();
+        List<BandRockGig> tmpGigsVkRockGig = new ArrayList<>();
         tmpGigsVkRockGig.addAll(gigsVkRockgig);
         if (isRefreshing) {
-        gigsVkRockgig = new ArrayList<Band>() {};
+        gigsVkRockgig = new ArrayList<BandRockGig>() {};
         return Observable
                 .zip(vkApiBridge.bandList(), rockGigApi.getEventsRockGig(), (strings, rockGigEvents) -> {
                     System.out.println("CONCMODEL COMBLATEST " + rockGigEvents.size());
-                    for (RockGigEvent event : rockGigEvents) {
-                        for (Band band : event.getBands()) {
-                            if (strings.contains(band.getBand().trim().toLowerCase())) {
+                    for (EventRockGig event : rockGigEvents) {
+                        for (BandRockGig bandRockGig : event.getBandRockGigs()) {
+                            if (strings.contains(bandRockGig.getBand().trim().toLowerCase())) {
 
                                 boolean isBandInList = false;
-                                for (Band bandInList :
+                                for (BandRockGig bandRockGigInList :
                                         gigsVkRockgig) {
-                                    if (bandInList.equals(band)){
-                                        bandInList.getGigs().add(event);
+                                    if (bandRockGigInList.equals(bandRockGig)){
+                                        bandRockGigInList.getGigs().add(event);
                                         isBandInList = true;
                                     }
                                 }
                                 if (!isBandInList){
-                                    band.getGigs().add(event);
-                                    gigsVkRockgig.add(band);
+                                    bandRockGig.getGigs().add(event);
+                                    gigsVkRockgig.add(bandRockGig);
                                 }
 
                                 try {
                                     System.out.println("CONCERTMODEL THREAD IS " + Thread.currentThread().getName());
-                                    lastfmApi.getBandInfo(band.getBand())
-                                            .subscribe(bandLastfm -> band.setBandImageUrl(bandLastfm.getImageUrl()));
+                                    lastfmApi.getBandInfo(bandRockGig.getBand())
+                                            .subscribe(bandLastfm -> bandRockGig.setBandImageUrl(bandLastfm.getImageUrl()));
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -130,25 +124,26 @@ public class ConcertsModel {
 
     }
 
-    public Observable<List<RockGigEvent>> getAllRockGigEvents (int PAGE, int IT_ON_PAGE) {
+    public Observable<List<EventRockGig>> getAllRockGigEvents (int PAGE, int IT_ON_PAGE) {
         return rockGigApi.getEventsRockGig()
                 .flatMap(rockGigEvents -> Observable.from(rockGigEvents))
                 .skip(IT_ON_PAGE*PAGE)
                 .take(IT_ON_PAGE)
                 .map(rockGigEvent -> {
-                    for (Band band: rockGigEvent.getBands()) {
+                    for (BandRockGig bandRockGig : rockGigEvent.getBandRockGigs()) {
                         try {
-                            lastfmApi.getBandInfo(band.getBand())
-                                    .subscribe(bandLastfm -> {band.setBandImageUrl(bandLastfm.getImageUrl());
+                            lastfmApi.getBandInfo(bandRockGig.getBand())
+                                    .subscribe(bandLastfm -> {
+                                        bandRockGig.setBandImageUrl(bandLastfm.getImageUrl());
                                         System.out.println("BAND URL ." + bandLastfm.getImageUrl()+".");
-                                        if (band.getBandImageUrl().length()<3&&band.getBandImageUrl().equals("")) {
-                                            band.setBandImageUrl("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg");
+                                        if (bandRockGig.getBandImageUrl().length()<3&& bandRockGig.getBandImageUrl().equals("")) {
+                                            bandRockGig.setBandImageUrl("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg");
                                         }
                                         System.out.println("BAND URL " + bandLastfm.getImageUrl());
                                     });
                         } catch (IOException e) {
                             e.printStackTrace();
-                            band.setBandImageUrl("http://p4cdn4static.sharpschool.com/UserFiles/Servers/Server_91869/Image/Band4.jpg");
+                            bandRockGig.setBandImageUrl("http://p4cdn4static.sharpschool.com/UserFiles/Servers/Server_91869/Image/Band4.jpg");
                         }
                     }
                     return rockGigEvent;
