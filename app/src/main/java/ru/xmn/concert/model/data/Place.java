@@ -3,7 +3,9 @@ package ru.xmn.concert.model.data;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Place {
+import io.realm.RealmObject;
+
+public class Place extends RealmObject{
 
     @SerializedName("clubid")
     @Expose

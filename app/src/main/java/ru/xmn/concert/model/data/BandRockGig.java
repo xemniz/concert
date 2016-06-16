@@ -6,7 +6,10 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BandRockGig {
+import io.realm.RealmObject;
+
+public class BandRockGig extends RealmObject{
+    public BandRockGig(){}
 
     @SerializedName("bandid")
     @Expose
