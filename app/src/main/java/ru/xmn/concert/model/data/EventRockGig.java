@@ -34,9 +34,9 @@ public class EventRockGig {
     @SerializedName("place")
     @Expose
     private Place place;
-    @SerializedName("bandRockGigs")
+    @SerializedName("bands")
     @Expose
-    private List<BandRockGig> bandRockGigs = new ArrayList<BandRockGig>();
+    private List<Band> bands = new ArrayList<Band>();
 
     /**
      *
@@ -203,19 +203,19 @@ public class EventRockGig {
     /**
      *
      * @return
-     * The bandRockGigs
+     * The bands
      */
-    public List<BandRockGig> getBandRockGigs() {
-        return bandRockGigs;
+    public List<Band> getBands() {
+        return bands;
     }
 
     /**
      *
-     * @param bandRockGigs
-     * The bandRockGigs
+     * @param bands
+     * The bands
      */
-    public void setBandRockGigs(List<BandRockGig> bandRockGigs) {
-        this.bandRockGigs = bandRockGigs;
+    public void setBands(List<Band> bands) {
+        this.bands = bands;
     }
 
 }

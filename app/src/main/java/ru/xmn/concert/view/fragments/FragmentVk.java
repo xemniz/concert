@@ -13,13 +13,15 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import java.util.List;
 
 import ru.xmn.concert.R;
-import ru.xmn.concert.model.data.BandRockGig;
+import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.EventRealm;
 import ru.xmn.concert.model.data.EventRockGig;
 import ru.xmn.concert.presenter.PresenterVkFragment;
 import ru.xmn.concert.view.BandsView;
 import ru.xmn.concert.view.adapters.BandsEventsAdapter;
 import ru.xmn.concert.view.adapters.EndlessRecyclerViewScrollListener;
 import ru.xmn.concert.view.adapters.EventsBandsAdapter;
+import ru.xmn.concert.view.adapters.EventsRealmAdapter;
 import ru.xmn.concert.view.common.MvpAppCompatFragment;
 
 public class FragmentVk extends MvpAppCompatFragment implements BandsView {
@@ -27,6 +29,7 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
     PresenterVkFragment presenter;
     private BandsEventsAdapter bandsEventsAdapter;
     private EventsBandsAdapter eventsBandsAdapter;
+    private EventsRealmAdapter eventsRealmAdapter;
 
     public FragmentVk() {
     }
@@ -39,8 +42,10 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
         recyclerView.setLayoutManager(linearLayoutManager);
         bandsEventsAdapter = new BandsEventsAdapter(this.getContext());
         eventsBandsAdapter = new EventsBandsAdapter(this.getContext());
+        eventsRealmAdapter = new EventsRealmAdapter(this.getContext());
 //        recyclerView.setAdapter(bandsEventsAdapter);
-        recyclerView.setAdapter(eventsBandsAdapter);
+//        recyclerView.setAdapter(eventsBandsAdapter);
+        recyclerView.setAdapter(eventsRealmAdapter);
         recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
@@ -53,7 +58,7 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
     }
 
     @Override
-    public void showData(List<BandRockGig> list) {
+    public void showData(List<Band> list) {
 
     }
 
@@ -98,13 +103,13 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
     }
 
     @Override
-    public void setBands(List<BandRockGig> bandRockGigs) {
-        bandsEventsAdapter.setBandRockGigs(bandRockGigs);
+    public void setBands(List<Band> bands) {
+        bandsEventsAdapter.setBands(bands);
     }
 
     @Override
-    public void addBands(List<BandRockGig> bandRockGigs) {
-        bandsEventsAdapter.addBands(bandRockGigs);
+    public void addBands(List<Band> bands) {
+        bandsEventsAdapter.addBands(bands);
     }
 
     @Override
@@ -115,5 +120,15 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
     @Override
     public void addGigs(List<EventRockGig> gigs) {
         eventsBandsAdapter.addGigs(gigs);
+    }
+
+    @Override
+    public void setGigsRealm(List<EventRealm> bands) {
+        eventsRealmAdapter.setGigs(bands);
+    }
+
+    @Override
+    public void addGigsRealm(List<EventRealm> bands) {
+        eventsRealmAdapter.addGigs(bands);
     }
 }

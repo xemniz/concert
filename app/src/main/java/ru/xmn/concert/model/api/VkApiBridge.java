@@ -102,12 +102,16 @@ public class VkApiBridge {
                         });
                     }
                 })
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(Schedulers.io())
                 .flatMap(vkResponse -> Observable.from((VKList<VKApiAudio>) vkResponse.parsedModel))
                 .flatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))
                 .distinct()
                 .map(s -> s.trim().toLowerCase())
+                .map(s -> {
+                    System.out.println(s);
+                    return s;
+                })
                 .toList();
 //                .toBlocking()
 //                .single();

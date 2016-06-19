@@ -122,8 +122,7 @@ public class RockGigApi {
                 })
                 .flatMap(s -> {
                     Gson gson = new Gson();
-                    Type listType = new TypeToken<ArrayList<EventRockGig>>() {
-                    }.getType();
+                    Type listType = new TypeToken<ArrayList<EventRockGig>>() {}.getType();
                     List<EventRockGig> eventRockGigs = gson.fromJson(s, listType);
                     return Observable.just(eventRockGigs);
                 });

@@ -1,12 +1,5 @@
 package ru.xmn.concert.model.data;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -20,6 +13,63 @@ public class BandRealm extends RealmObject {
     private String name;
     private String bandgenre;
     private String bandvk;
-    private RealmList<EventRealm> gigs = new RealmList<>();
     private String bandImageUrl;
+
+    public BandRealm() {
+    }
+
+    public BandRealm(Band band) {
+        bandid = band.getBandid();
+        bandgenre = band.getBandgenre();
+        bandvk = band.getBandvk();
+        name = band.getBand();
+    }
+
+    public String getBandid() {
+        return bandid;
+    }
+
+    public void setBandid(String bandid) {
+        this.bandid = bandid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getBandgenre() {
+        return bandgenre;
+    }
+
+    public void setBandgenre(String bandgenre) {
+        this.bandgenre = bandgenre;
+    }
+
+    public String getBandvk() {
+        return bandvk;
+    }
+
+    public void setBandvk(String bandvk) {
+        this.bandvk = bandvk;
+    }
+
+    public String getBandImageUrl() {
+        return bandImageUrl;
+    }
+
+    public void setBandImageUrl(String bandImageUrl) {
+        this.bandImageUrl = bandImageUrl;
+    }
+
+    @Override
+    public String toString() {
+        return "BandRealm{" +
+                "bandImageUrl='" + bandImageUrl + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

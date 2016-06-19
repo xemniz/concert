@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.xmn.concert.R;
-import ru.xmn.concert.model.data.BandRockGig;
+import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.model.data.EventRockGig;
 
@@ -25,7 +25,7 @@ import ru.xmn.concert.model.data.EventRockGig;
 
 public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.ViewHolder> {
 
-    private List<BandRockGig> bandRockGigs = new ArrayList<>();
+    private List<Band> bands = new ArrayList<>();
     private Context context;
 
     public BandsEventsAdapter(Context context) {
@@ -33,8 +33,8 @@ public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.
 
     }
 
-    public void setBandRockGigs(List<BandRockGig> repoList) {
-        bandRockGigs.addAll(repoList);
+    public void setBands(List<Band> repoList) {
+        bands.addAll(repoList);
         notifyDataSetChanged();
     }
 
@@ -48,28 +48,28 @@ public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
-        BandRockGig bandRockGig = bandRockGigs.get(i);
-        viewHolder.name.setText(bandRockGig.getBand());
-        EventRockGig event = bandRockGig.getGigs().get(0);
+        Band band = bands.get(i);
+        viewHolder.name.setText(band.getBand());
+        EventRockGig event = band.getGigs().get(0);
         viewHolder.date.setText(event.getDate()+", "+event.getTime()+", "+event.getPrice());
-        if (bandRockGig.getGigs().size()>1)
-            viewHolder.place.setText(event.getPlace().getName()+" - "+event.getName()+" +"+ (bandRockGig.getGigs().size()-1));
+        if (band.getGigs().size()>1)
+            viewHolder.place.setText(event.getPlace().getName()+" - "+event.getName()+" +"+ (band.getGigs().size()-1));
         else
             viewHolder.place.setText(event.getPlace().getName()+" - "+event.getName());
 
         Picasso.with(context)
-                .load(bandRockGig.getBandImageUrl())
+                .load(band.getBandImageUrl())
                 .into(viewHolder.image);
     }
 
     @Override
     public int getItemCount() {
-        return bandRockGigs.size();
+        return bands.size();
     }
 
-    public void addBands(List<BandRockGig> bandRockGigs) {
+    public void addBands(List<Band> bands) {
 
-        this.bandRockGigs.addAll(bandRockGigs);
+        this.bands.addAll(bands);
         notifyDataSetChanged();
     }
 
@@ -89,14 +89,14 @@ public class BandsEventsAdapter extends RecyclerView.Adapter<BandsEventsAdapter.
         }
 
     }
-    public void add(BandRockGig gig, int position) {
-        bandRockGigs.add(position, gig);
+    public void add(Band gig, int position) {
+        bands.add(position, gig);
         notifyItemInserted(position);
     }
 
     public void remove(EventGig gig) {
-        int position = bandRockGigs.indexOf(gig);
-        bandRockGigs.remove(position);
+        int position = bands.indexOf(gig);
+        bands.remove(position);
         notifyItemRemoved(position);
     }
 }

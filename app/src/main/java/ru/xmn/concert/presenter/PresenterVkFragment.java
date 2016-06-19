@@ -4,7 +4,8 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 
 import ru.xmn.concert.model.ConcertsModel;
-import ru.xmn.concert.model.data.BandRockGig;
+import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.EventRealm;
 import ru.xmn.concert.model.data.EventRockGig;
 import ru.xmn.concert.view.BandsView;
 import rx.Observer;
@@ -35,8 +36,8 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
 //                .getBandsGigsVk(true)
 //                .subscribeOn(Schedulers.io())
 //                .observeOn(AndroidSchedulers.mainThread())
-//                .map(bandRockGigs -> bandRockGigs.subList(0, PAGE_SIZE))
-//                .subscribe(new Observer<List<BandRockGig>>() {
+//                .map(bands -> bands.subList(0, PAGE_SIZE))
+//                .subscribe(new Observer<List<Band>>() {
 //                    @Override
 //                    public void onCompleted() {
 //                    }
@@ -48,9 +49,9 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
 //                    }
 //
 //                    @Override
-//                    public void onNext(List<BandRockGig> data) {
+//                    public void onNext(List<Band> data) {
 //                        if (data != null && !data.isEmpty()) {
-//                            getViewState().setBandRockGigs(data);
+//                            getViewState().setBands(data);
 //                        }
 //                    }
 //                });
@@ -71,12 +72,12 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
                         else
                             return bands.subList(page * PAGE_SIZE, bands.size());
                     else
-                        return new ArrayList<BandRockGig>();
+                        return new ArrayList<Band>();
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-//                .map(bandRockGigs -> bandRockGigs.subList(10, 17))
-                .subscribe(new Observer<List<BandRockGig>>() {
+//                .map(bands -> bands.subList(10, 17))
+                .subscribe(new Observer<List<Band>>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -88,7 +89,7 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
                     }
 
                     @Override
-                    public void onNext(List<BandRockGig> data) {
+                    public void onNext(List<Band> data) {
                         if (data != null && !data.isEmpty()) {
                             getViewState().addBands(data);
                         }
@@ -96,17 +97,39 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
                 });
     }
 
-    public void eventList (int page) {
+    public void eventList(int page) {
         if (!subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
         subscription = concertsModel
-                .getAllRockGigEvents(page+1, PAGE_SIZE)
-                .subscribeOn(Schedulers.io())
+
+//                .getAllRockGigEvents(page+1, PAGE_SIZE)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Observer<List<EventRockGig>>() {
+//                    @Override
+//                    public void onCompleted() {
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        e.printStackTrace();
+//                        getViewState().showError(e.getMessage());
+//                    }
+//
+//                    @Override
+//                    public void onNext(List<EventRockGig> eventRockGigs) {
+//                        getViewState().addGigs(eventRockGigs);
+//                    }
+//                });
+
+                .getAllEventsRealm(page + 1, PAGE_SIZE)
+//                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<EventRockGig>>() {
+                .subscribe(new Observer<List<EventRealm>>() {
                     @Override
                     public void onCompleted() {
+
                     }
 
                     @Override
@@ -116,8 +139,8 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
                     }
 
                     @Override
-                    public void onNext(List<EventRockGig> eventRockGigs) {
-                        getViewState().addGigs(eventRockGigs);
+                    public void onNext(List<EventRealm> eventRealms) {
+                        getViewState().addGigsRealm(eventRealms);
                     }
                 });
     }

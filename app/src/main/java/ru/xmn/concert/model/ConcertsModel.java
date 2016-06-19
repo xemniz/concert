@@ -1,14 +1,22 @@
 package ru.xmn.concert.model;
 
+import android.util.Log;
+
 import com.vk.sdk.api.model.VKApiAudio;
 import com.vk.sdk.api.model.VKList;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import ru.xmn.concert.JobExecutor;
 import ru.xmn.concert.model.api.LastfmApi;
+import ru.xmn.concert.model.api.RealmApi;
 import ru.xmn.concert.model.api.RockGigApi;
 import ru.xmn.concert.model.api.VkApiBridge;
-import ru.xmn.concert.model.data.BandRockGig;
+import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.BandLastfm;
+import ru.xmn.concert.model.data.BandRealm;
 import ru.xmn.concert.model.data.EventGig;
+import ru.xmn.concert.model.data.EventRealm;
 import ru.xmn.concert.model.data.EventRockGig;
 import rx.Observable;
 import rx.Subscriber;
@@ -17,13 +25,16 @@ import rx.schedulers.Schedulers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ConcertsModel {
     RockGigApi rockGigApi = new RockGigApi();
     LastfmApi lastfmApi = new LastfmApi();
     VKList<VKApiAudio> list;
-    List<BandRockGig> gigsVkRockgig = new ArrayList<>();
+    List<Band> gigsVkRockgig = new ArrayList<>();
+    VkApiBridge vkApiBridge = new VkApiBridge();
+    RealmApi realmApi = new RealmApi();
 
     public VKList<VKApiAudio> getList() {
         return list;
@@ -70,84 +81,115 @@ public class ConcertsModel {
     }
 
     public Observable getArtistInfo(final String band) throws IOException {
-        return lastfmApi.getBandInfo(band)
+        return lastfmApi.getBandInfoObs(band)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
 
-    public Observable<List<BandRockGig>> getBandsGigsVk(boolean isRefreshing) {
+    public Observable<List<Band>> getBandsGigsVk(boolean isRefreshing) {
 
         System.out.println("INCONCERTSMODEL " + Thread.currentThread().getName() + " gigsVkRockgig " + gigsVkRockgig.size());
-        VkApiBridge vkApiBridge = new VkApiBridge();
-//        List<String> vkAudioList = vkApiBridge.bandList();
-        List<BandRockGig> tmpGigsVkRockGig = new ArrayList<>();
+        List<Band> tmpGigsVkRockGig = new ArrayList<>();
         tmpGigsVkRockGig.addAll(gigsVkRockgig);
         if (isRefreshing) {
-        gigsVkRockgig = new ArrayList<BandRockGig>() {};
-        return Observable
-                .zip(vkApiBridge.bandList(), rockGigApi.getEventsRockGig(), (strings, rockGigEvents) -> {
-                    System.out.println("CONCMODEL COMBLATEST " + rockGigEvents.size());
-                    for (EventRockGig event : rockGigEvents) {
-                        for (BandRockGig bandRockGig : event.getBandRockGigs()) {
-                            if (strings.contains(bandRockGig.getBand().trim().toLowerCase())) {
+            gigsVkRockgig = new ArrayList<Band>() {
+            };
+            return Observable
+                    .zip(vkApiBridge.bandList(), rockGigApi.getEventsRockGig(), (strings, rockGigEvents) -> {
+                        System.out.println("CONCMODEL COMBLATEST " + rockGigEvents.size());
+                        for (EventRockGig event : rockGigEvents) {
+                            for (Band band : event.getBands()) {
+                                if (strings.contains(band.getBand().trim().toLowerCase())) {
 
-                                boolean isBandInList = false;
-                                for (BandRockGig bandRockGigInList :
-                                        gigsVkRockgig) {
-                                    if (bandRockGigInList.equals(bandRockGig)){
-                                        bandRockGigInList.getGigs().add(event);
-                                        isBandInList = true;
+                                    boolean isBandInList = false;
+                                    for (Band bandInList :
+                                            gigsVkRockgig) {
+                                        if (bandInList.equals(band)) {
+                                            bandInList.getGigs().add(event);
+                                            isBandInList = true;
+                                        }
                                     }
-                                }
-                                if (!isBandInList){
-                                    bandRockGig.getGigs().add(event);
-                                    gigsVkRockgig.add(bandRockGig);
-                                }
+                                    if (!isBandInList) {
+                                        band.getGigs().add(event);
+                                        gigsVkRockgig.add(band);
+                                    }
 
-                                try {
-                                    System.out.println("CONCERTMODEL THREAD IS " + Thread.currentThread().getName());
-                                    lastfmApi.getBandInfo(bandRockGig.getBand())
-                                            .subscribe(bandLastfm -> bandRockGig.setBandImageUrl(bandLastfm.getImageUrl()));
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                                    try {
+                                        System.out.println("CONCERTMODEL THREAD IS " + Thread.currentThread().getName());
+                                        lastfmApi.getBandInfoObs(band.getBand())
+                                                .subscribe(bandLastfm -> band.setBandImageUrl(bandLastfm.getImageUrl()));
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             }
                         }
-                    }
-                    System.out.println("CONCERTMODEL BEFORERETURN " + gigsVkRockgig.size());
-                    return gigsVkRockgig;
-                }).observeOn(Schedulers.io());
+                        System.out.println("CONCERTMODEL BEFORERETURN " + gigsVkRockgig.size());
+                        return gigsVkRockgig;
+                    }).observeOn(Schedulers.io());
         } else {
             return Observable.just(tmpGigsVkRockGig);
         }
 
     }
 
-    public Observable<List<EventRockGig>> getAllRockGigEvents (int PAGE, int IT_ON_PAGE) {
+    public Observable<List<EventRockGig>> getAllRockGigEvents(int PAGE, int IT_ON_PAGE) {
         return rockGigApi.getEventsRockGig()
-                .flatMap(rockGigEvents -> Observable.from(rockGigEvents))
-                .skip(IT_ON_PAGE*PAGE)
+                .flatMap(Observable::from)
+                .skip(IT_ON_PAGE * PAGE)
                 .take(IT_ON_PAGE)
                 .map(rockGigEvent -> {
-                    for (BandRockGig bandRockGig : rockGigEvent.getBandRockGigs()) {
+                    for (Band band : rockGigEvent.getBands()) {
                         try {
-                            lastfmApi.getBandInfo(bandRockGig.getBand())
+                            lastfmApi.getBandInfoObs(band.getBand())
                                     .subscribe(bandLastfm -> {
-                                        bandRockGig.setBandImageUrl(bandLastfm.getImageUrl());
-                                        System.out.println("BAND URL ." + bandLastfm.getImageUrl()+".");
-                                        if (bandRockGig.getBandImageUrl().length()<3&& bandRockGig.getBandImageUrl().equals("")) {
-                                            bandRockGig.setBandImageUrl("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg");
+                                        band.setBandImageUrl(bandLastfm.getImageUrl());
+                                        System.out.println("BAND URL ." + bandLastfm.getImageUrl() + ".");
+                                        if (band.getBandImageUrl().length() < 3 && band.getBandImageUrl().equals("")) {
+                                            band.setBandImageUrl("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg");
                                         }
                                         System.out.println("BAND URL " + bandLastfm.getImageUrl());
                                     });
                         } catch (IOException e) {
                             e.printStackTrace();
-                            bandRockGig.setBandImageUrl("http://p4cdn4static.sharpschool.com/UserFiles/Servers/Server_91869/Image/Band4.jpg");
+                            band.setBandImageUrl("http://p4cdn4static.sharpschool.com/UserFiles/Servers/Server_91869/Image/Band4.jpg");
                         }
                     }
                     return rockGigEvent;
                 })
                 .toList();
+    }
+
+    public Observable<List<EventRealm>> getAllEventsRealm(int PAGE, int IT_ON_PAGE) {
+        return Realm.getDefaultInstance()
+                .where(EventRealm.class)
+                .greaterThanOrEqualTo("date", new Date(System.currentTimeMillis()))
+                .findAllSortedAsync("date")
+                .asObservable()
+                .filter(RealmResults::isLoaded)
+                .take(1)
+                .flatMap(Observable::from)
+                .skip(IT_ON_PAGE * PAGE)
+                .map(eventRealm -> {
+                    Observable.from(eventRealm.getBandRockGigs())
+                            .flatMap(bandRealm -> Observable.just(bandRealm.getName()))
+                            .observeOn(Schedulers.io())
+                            .map(s -> {
+                                Log.d(getClass().getSimpleName(), "Thread of lastfm image getting "+ Thread.currentThread().toString());
+                                BandLastfm bandInfo = lastfmApi.getBandInfo(s);
+                                Realm realm = Realm.getDefaultInstance();
+                                realm.beginTransaction();
+                                BandRealm bandRealm = realm.where(BandRealm.class).equalTo("name", s).findFirst();
+                                if (bandRealm.getBandImageUrl() == null || bandRealm.getBandImageUrl().length()<1)
+                                    bandRealm.setBandImageUrl(bandInfo.getImageUrl());
+                                realm.commitTransaction();
+                                return s;
+                            })
+                    .toList().toBlocking().single();
+                    return eventRealm;
+                })
+                .toList()
+                ;
     }
 }

@@ -1,4 +1,5 @@
 package ru.xmn.concert;
+
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -6,12 +7,17 @@ import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKAccessTokenTracker;
 import com.vk.sdk.VKSdk;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import ru.xmn.concert.view.MainActivity;
 
 public class Application extends android.app.Application {
 
     private static Application instance;
-    public static Application get() { return instance; }
+
+    public static Application get() {
+        return instance;
+    }
 
     VKAccessTokenTracker vkAccessTokenTracker = new VKAccessTokenTracker() {
         @Override
@@ -31,6 +37,11 @@ public class Application extends android.app.Application {
         instance = this;
         vkAccessTokenTracker.startTracking();
         VKSdk.initialize(this);
-
+        Realm.setDefaultConfiguration(
+                new RealmConfiguration.Builder(Application.get().getApplicationContext())
+                        .deleteRealmIfMigrationNeeded()
+                        .name("myOtherRealm.realm")
+                        .build()
+        );
     }
 }

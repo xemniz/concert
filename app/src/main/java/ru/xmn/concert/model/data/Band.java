@@ -6,10 +6,8 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.RealmObject;
-
-public class BandRockGig extends RealmObject{
-    public BandRockGig(){}
+public class Band {
+    public Band(){}
 
     @SerializedName("bandid")
     @Expose
@@ -120,9 +118,9 @@ public class BandRockGig extends RealmObject{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BandRockGig bandRockGig1 = (BandRockGig) o;
+        Band band1 = (Band) o;
 
-        return band != null ? band.equals(bandRockGig1.band) : bandRockGig1.band == null;
+        return band != null ? band.equals(band1.band) : band1.band == null;
 
     }
 

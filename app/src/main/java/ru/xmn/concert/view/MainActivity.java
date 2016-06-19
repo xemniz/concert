@@ -40,14 +40,19 @@ import com.vk.sdk.api.VKError;
 import java.util.List;
 
 import br.com.customsearchable.model.CustomSearchableInfo;
+import io.realm.Realm;
 import ru.xmn.concert.R;
-import ru.xmn.concert.model.data.BandRockGig;
+import ru.xmn.concert.model.api.RealmApi;
+import ru.xmn.concert.model.api.RockGigApi;
+import ru.xmn.concert.model.api.VkApiBridge;
+import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.presenter.MainPresenter;
 import ru.xmn.concert.view.common.MvpAppCompatActivity;
 import ru.xmn.concert.view.fragments.FragmentVk;
 import ru.xmn.concert.view.fragments.FragmentThree;
 import ru.xmn.concert.view.fragments.FragmentTwo;
 import ru.xmn.concert.view.fragments.FragmentVkSettings;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends MvpAppCompatActivity implements MainView {
     @InjectPresenter
@@ -180,8 +185,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
                     }
                 })
                 .build();
-
-
+        test();
     }
 
     private void selectItem(int position) {
@@ -253,7 +257,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     @Override
-    public void showData(List<BandRockGig> list) {
+    public void showData(List<Band> list) {
     }
 
     @Override
@@ -299,4 +303,31 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
         fragmentManager.beginTransaction().add(R.id.content_frame, fragmentVk).commit();
 //        fragmentManager.beginTransaction().add(R.id.settings_frame, fragmentVkSettings).commit();
     }
-}
+
+    private void test(){
+        RealmApi realmApi = new RealmApi();
+        VkApiBridge vkApiBridge = new VkApiBridge();
+        RockGigApi rockGigApi = new RockGigApi();
+
+//        Realm realmclean = Realm.getDefaultInstance();
+//                realmclean.beginTransaction();
+//        realmclean.deleteAll();
+//        realmclean.commitTransaction();
+
+//        realmApi.GigsToRealm(rockGigApi.getEventsRockGig().subscribeOn(Schedulers.io()).toBlocking().single());
+//        realmApi.setImages();
+
+//        vkApiBridge.bandList().subscribe(strings -> {
+//            RealmQuery<EventRealm> query = RealmApi.myRealm.where(EventRealm.class);
+////            query.equalTo("bandRockGigs.name", strings.get(0));
+//            query.equalTo("bandRockGigs.name", strings.get(0), Case.INSENSITIVE);
+//            for (String s :
+//                    strings) {
+//                query.or().equalTo("bandRockGigs.name", s.trim().toLowerCase(), Case.INSENSITIVE);
+//            }
+//            RealmResults<EventRealm> eventRealms = query.findAll();
+//            System.out.println("SIZEEEEEEEE " + eventRealms.size());
+//            eventRealms.asObservable().flatMap(eventRealms1 -> Observable.from(eventRealms1))
+//                    .subscribe(eventRealm -> System.out.println(eventRealm.toString()));
+//        });
+}}

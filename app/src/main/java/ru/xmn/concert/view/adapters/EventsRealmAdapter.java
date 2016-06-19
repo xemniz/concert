@@ -1,8 +1,8 @@
 package ru.xmn.concert.view.adapters;
 
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,81 +16,88 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.realm.Realm;
+import io.realm.RealmObject;
 import ru.xmn.concert.R;
 import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.BandRealm;
 import ru.xmn.concert.model.data.EventGig;
+import ru.xmn.concert.model.data.EventRealm;
 import ru.xmn.concert.model.data.EventRockGig;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by xmn on 01.06.2016.
+ * Created by xmn on 19.06.2016.
  */
 
-public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.ViewHolder> {
-
-    private List<EventRockGig> gigs = new ArrayList<>();
+public class EventsRealmAdapter extends RecyclerView.Adapter<EventsRealmAdapter.ViewHolder> {
+    private List<EventRealm> gigs = new ArrayList<>();
     private Context context;
 
-    public EventsBandsAdapter(Context context) {
+    public EventsRealmAdapter(Context context) {
         this.context = context;
-
     }
 
-    public void setGigs(List<EventRockGig> repoList) {
+    public void setGigs(List<EventRealm> repoList) {
         gigs.addAll(repoList);
         notifyDataSetChanged();
     }
 
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public EventsRealmAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.event_adapter_layout, viewGroup, false);
-        return new ViewHolder(v);
+        return new EventsRealmAdapter.ViewHolder(v);
     }
 
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(EventsRealmAdapter.ViewHolder viewHolder, int i) {
         viewHolder.image.setImageDrawable(null);
-        EventRockGig event = gigs.get(i);
+        EventRealm event = gigs.get(i);
         viewHolder.place.setText(event.getPlace().getName() + " - " + event.getName());
         viewHolder.date.setText(event.getDate() + ", " + event.getTime() + ", " + event.getPrice());
-        if (event.getBands().size()>0) {
-            Band defaultBand = event.getBands().get(0);
-            Picasso.with(context)
-                    .load(defaultBand.getBandImageUrl())
-                    .into(viewHolder.image);
-            viewHolder.name.setText(defaultBand.getBand());
-        } else
-        {
+        if (event.getBandRockGigs().size() > 0) {
+            BandRealm defaultBand = event.getBandRockGigs().get(0);
+            Log.d(getClass().getSimpleName(), "NAME OF DEFAULT BAND = " + defaultBand.toString());
+            if (defaultBand.getBandImageUrl().length() < 1 || defaultBand.getBandImageUrl() == null)
+                Picasso.with(context)
+                        .load("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg")
+                        .into(viewHolder.image);
+            else
+                Picasso.with(context)
+                        .load(defaultBand.getBandImageUrl())
+                        .into(viewHolder.image);
+            viewHolder.name.setText(defaultBand.getName());
+        } else {
             Picasso.with(context)
                     .load("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg")
                     .into(viewHolder.image);
             viewHolder.name.setText("");
         }
 
-        Observable<Band> changeView = Observable
-                .just(event.getBands())
+        Observable<BandRealm> changeView = Observable
+                .just(event.getBandRockGigs())
                 .flatMap(bands -> {
-                    Collections.shuffle(bands);
+//                    Collections.shuffle(bands);
                     return Observable.from(bands);
                 });
 
 
-        Observable.zip(
-                changeView,
-                Observable.interval(4, TimeUnit.SECONDS),
-                (band, aLong) -> band)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(band -> {
-                    Picasso.with(context)
-                            .load(band.getBandImageUrl())
-                            .into(viewHolder.image);
-                    viewHolder.name.setText(band.getBand());
-                });
+//        Observable.zip(
+//                changeView,
+//                Observable.interval(4, TimeUnit.SECONDS),
+//                (band, aLong) -> band)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(band -> {
+//                    Picasso.with(context)
+//                            .load(band.getBandImageUrl())
+//                            .into(viewHolder.image);
+//                    viewHolder.name.setText(band.getName());
+//                });
     }
 
     @Override
@@ -98,7 +105,7 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
         return gigs.size();
     }
 
-    public void addGigs(List<EventRockGig> gigs) {
+    public void addGigs(List<EventRealm> gigs) {
 
         this.gigs.addAll(gigs);
         notifyDataSetChanged();
@@ -126,12 +133,12 @@ public class EventsBandsAdapter extends RecyclerView.Adapter<EventsBandsAdapter.
 
     }
 
-    public void add(EventRockGig gig, int position) {
+    public void add(EventRealm gig, int position) {
         gigs.add(position, gig);
         notifyItemInserted(position);
     }
 
-    public void remove(EventGig gig) {
+    public void remove(EventRealm gig) {
         int position = gigs.indexOf(gig);
         gigs.remove(position);
         notifyItemRemoved(position);

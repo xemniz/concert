@@ -7,13 +7,14 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 import java.util.List;
 
-import ru.xmn.concert.model.data.BandRockGig;
+import ru.xmn.concert.model.data.Band;
+import ru.xmn.concert.model.data.EventRealm;
 import ru.xmn.concert.model.data.EventRockGig;
 
 
 @StateStrategyType(SingleStateStrategy.class)
 public interface BandsView extends MvpView {
-    public void showData(List<BandRockGig> list);
+    public void showData(List<Band> list);
 
     void showError(String message);
 
@@ -31,13 +32,18 @@ public interface BandsView extends MvpView {
 
     void hideListProgress();
 
-    void setBands(List<BandRockGig> bandRockGigs);
+    void setBands(List<Band> bands);
 
     @StateStrategyType(AddToEndStrategy.class)
-    void addBands(List<BandRockGig> bandRockGigs);
+    void addBands(List<Band> bands);
 
     void setGigs(List<EventRockGig> bands);
 
     @StateStrategyType(AddToEndStrategy.class)
     void addGigs(List<EventRockGig> bands);
+
+    void setGigsRealm(List<EventRealm> bands);
+
+    @StateStrategyType(AddToEndStrategy.class)
+    void addGigsRealm(List<EventRealm> bands);
 }

@@ -14,7 +14,7 @@ public class LastfmApi {
     private final String secret = "b8c42600c5d31faa6d282cb5f104b9b9";   // api secret
     Locale dLocale = new Locale("ru", "RU");
 
-    public Observable<BandLastfm> getBandInfo(String bandName) throws IOException {
+    public Observable<BandLastfm> getBandInfoObs(String bandName) throws IOException {
         return Observable
                 .just(Artist.getInfo(bandName, dLocale, "pe-psy", key))
                 .observeOn(Schedulers.io())
@@ -23,7 +23,23 @@ public class LastfmApi {
                         artist.getImageURL(ImageSize.EXTRALARGE))))
                 .onErrorResumeNext(throwable -> Observable.just(new BandLastfm(bandName,
                         " ",
-                        "http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg")))
-                ;
+                        "http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg")));
+    }
+
+    public BandLastfm getBandInfo(String bandName) {
+        Artist artist = Artist.getInfo(bandName, dLocale, "pe-psy", key);
+        try {
+            if (artist.getImageURL(ImageSize.EXTRALARGE).length() < 1)
+                return new BandLastfm(bandName,
+                        artist.getWikiSummary(),
+                        "http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg");
+            return new BandLastfm(artist.getName(),
+                    artist.getWikiSummary(),
+                    artist.getImageURL(ImageSize.EXTRALARGE));
+        } catch (Exception e) {
+            return new BandLastfm(bandName,
+                    " ",
+                    "http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg");
+        }
     }
 }

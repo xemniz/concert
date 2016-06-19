@@ -11,7 +11,7 @@
     <string name="nameTxt">nameTxt</string>
     <string name="dateAdapter">date</string>
     <string name="nameAdapter">name</string>
-    <string name="bandsAdapter">bandRockGigs</string>
+    <string name="bandsAdapter">bands</string>
     <string name="timeAdapter">00:00</string>
     <string name="priceAdapter">000</string>
     <string name="placeAdapter">Place</string>

@@ -2,15 +2,10 @@ package ru.xmn.concert.model.data;
 
 import android.util.Log;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -25,14 +20,14 @@ public class EventRealm extends RealmObject {
     private String price;
     private String gigvk;
     private String poster;
-    private RealmList<GenreRealm> genres = new RealmList<>();
+    private String genres;
     private Place place;
-    private RealmList<BandRockGig> bandRockGigs = new RealmList<>();
+    private RealmList<BandRealm> bandRockGigs = new RealmList<>();
 
     public EventRealm() {
     }
 
-    EventRealm(EventRockGig eventRockGig) {
+    public EventRealm(EventRockGig eventRockGig) {
         eventid = eventRockGig.getEventid();
         name = eventRockGig.getName();
         time = eventRockGig.getTime();
@@ -42,22 +37,18 @@ public class EventRealm extends RealmObject {
         place = eventRockGig.getPlace();
 
         //setting genres
-        String[] genresArr = eventRockGig.getGenre().split(", ");
-        GenreRealm[] genreRealms = new GenreRealm[genresArr.length];
-
-        int i = 0;
-        for (String s :
-                genresArr) {
-            genreRealms[i].name = s;
-            i++;
-        }
-        genres = new RealmList<>(genreRealms);
+        genres = eventRockGig.getGenre();
 
         //setting bands
-        bandRockGigs = new RealmList<>((BandRockGig[]) eventRockGig.getBandRockGigs().toArray());
+        Log.d(getClass().getSimpleName(), "Setting bands " + eventRockGig.getBands().size());
+        for (Band band :
+                eventRockGig.getBands()) {
+            bandRockGigs.add(new BandRealm(band));
+            Log.d(getClass().getSimpleName(), "BAND NAME "+ bandRockGigs.get(0));
+        }
 
         //setting date
-
+        date = toDate(eventRockGig.getDate());
     }
 
     public String getEventid() {
@@ -116,11 +107,11 @@ public class EventRealm extends RealmObject {
         this.poster = poster;
     }
 
-    public RealmList<GenreRealm> getGenres() {
+    public String getGenres() {
         return genres;
     }
 
-    public void setGenres(RealmList<GenreRealm> genres) {
+    public void setGenres(String genres) {
         this.genres = genres;
     }
 
@@ -132,15 +123,16 @@ public class EventRealm extends RealmObject {
         this.place = place;
     }
 
-    public RealmList<BandRockGig> getBandRockGigs() {
+    public RealmList<BandRealm> getBandRockGigs() {
         return bandRockGigs;
     }
 
-    public void setBandRockGigs(RealmList<BandRockGig> bandRockGigs) {
+    public void setBandRockGigs(RealmList<BandRealm> bandRockGigs) {
         this.bandRockGigs = bandRockGigs;
     }
 
     public Date toDate(String dateString) {
+        dateString += " " + time + ":00";
         Date date = null;
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
@@ -153,4 +145,19 @@ public class EventRealm extends RealmObject {
         return date;
     }
 
+    @Override
+    public String toString() {
+        return "EventRealm{" +
+                "eventid='" + eventid + '\'' +
+                ", name='" + name + '\'' +
+                ", date=" + date +
+                ", time='" + time + '\'' +
+                ", price='" + price + '\'' +
+                ", gigvk='" + gigvk + '\'' +
+                ", poster='" + poster + '\'' +
+                ", genres='" + genres + '\'' +
+                ", place=" + place +
+                ", bands=" + bandRockGigs +
+                '}';
+    }
 }
