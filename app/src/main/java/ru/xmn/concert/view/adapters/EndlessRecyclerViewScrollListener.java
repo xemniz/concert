@@ -4,6 +4,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.widget.AbsListView;
 public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
     // The minimum amount of items to have below your current scroll position
@@ -87,6 +88,7 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
         // If we do need to reload some more data, we execute onLoadMore to fetch the data.
         // threshold should reflect how many total columns there are too
         if (!loading && (lastVisibleItemPosition + visibleThreshold) > totalItemCount) {
+            Log.d(getClass().getSimpleName(), "ONLOADMORE");
             currentPage++;
             onLoadMore(currentPage, totalItemCount);
             loading = true;

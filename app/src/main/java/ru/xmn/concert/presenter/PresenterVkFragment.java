@@ -1,5 +1,7 @@
 package ru.xmn.concert.presenter;
 
+import android.util.Log;
+
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 
@@ -31,6 +33,7 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
         eventList(0);
+        Log.d(getClass().getSimpleName(), "ONFIRSTATTACH");
 
 //        subscription = concertsModel
 //                .getBandsGigsVk(true)
@@ -124,7 +127,11 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
 //                });
 
                 .getAllEventsRealm(page + 1, PAGE_SIZE)
-//                .subscribeOn(Schedulers.newThread())
+                .map(eventRealms -> {
+                    Log.d(getClass().getSimpleName(), "EVENTREALMS SIZE "+eventRealms.size());
+                    return eventRealms;
+                })
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<EventRealm>>() {
                     @Override

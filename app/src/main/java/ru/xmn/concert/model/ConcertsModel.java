@@ -19,6 +19,7 @@ import ru.xmn.concert.model.data.EventGig;
 import ru.xmn.concert.model.data.EventRealm;
 import ru.xmn.concert.model.data.EventRockGig;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -29,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ConcertsModel {
+    String TAG = getClass().getSimpleName();
     RockGigApi rockGigApi = new RockGigApi();
     LastfmApi lastfmApi = new LastfmApi();
     VKList<VKApiAudio> list;
@@ -162,19 +164,25 @@ public class ConcertsModel {
     }
 
     public Observable<List<EventRealm>> getAllEventsRealm(int PAGE, int IT_ON_PAGE) {
-        return Realm.getDefaultInstance()
-                .where(EventRealm.class)
-                .greaterThanOrEqualTo("date", new Date(System.currentTimeMillis()))
-                .findAllSortedAsync("date")
-                .asObservable()
-                .filter(RealmResults::isLoaded)
-                .take(1)
+        return Observable.create(new Observable.OnSubscribe<List<EventRealm>>() {
+            @Override
+            public void call(Subscriber<? super List<EventRealm>> subscriber) {
+                RealmResults<EventRealm> eventRealms = Realm.getDefaultInstance()
+                        .where(EventRealm.class)
+                        .greaterThanOrEqualTo("date", new Date(System.currentTimeMillis()))
+                        .findAllSorted("date");
+                Log.d(TAG, "call: realm results count "+eventRealms.size());
+                subscriber.onNext(eventRealms);
+                subscriber.onCompleted();
+            }
+        })
                 .flatMap(Observable::from)
                 .skip(IT_ON_PAGE * PAGE)
+                .take(IT_ON_PAGE)
                 .map(eventRealm -> {
+                    Log.d(getClass().getSimpleName(), "COUNT IN GETBANDSREALM "+eventRealm.getBandRockGigs().size());
                     Observable.from(eventRealm.getBandRockGigs())
                             .flatMap(bandRealm -> Observable.just(bandRealm.getName()))
-                            .observeOn(Schedulers.io())
                             .map(s -> {
                                 Log.d(getClass().getSimpleName(), "Thread of lastfm image getting "+ Thread.currentThread().toString());
                                 BandLastfm bandInfo = lastfmApi.getBandInfo(s);
@@ -190,6 +198,6 @@ public class ConcertsModel {
                     return eventRealm;
                 })
                 .toList()
-                ;
+                .single();
     }
 }
