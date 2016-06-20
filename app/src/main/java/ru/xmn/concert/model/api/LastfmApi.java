@@ -13,6 +13,7 @@ public class LastfmApi {
     private final String key = "2bfb15fbcefb91f170233c99ff4af225";      // api key
     private final String secret = "b8c42600c5d31faa6d282cb5f104b9b9";   // api secret
     Locale dLocale = new Locale("ru", "RU");
+    static public final String DEFAULT_PIC = "http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg";
 
     public Observable<BandLastfm> getBandInfoObs(String bandName) throws IOException {
         return Observable
@@ -23,7 +24,7 @@ public class LastfmApi {
                         artist.getImageURL(ImageSize.EXTRALARGE))))
                 .onErrorResumeNext(throwable -> Observable.just(new BandLastfm(bandName,
                         " ",
-                        "http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg")));
+                        DEFAULT_PIC)));
     }
 
     public BandLastfm getBandInfo(String bandName) {

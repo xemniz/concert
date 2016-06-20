@@ -9,9 +9,13 @@ import java.util.Date;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
+import ru.xmn.concert.model.api.LastfmApi;
 
 public class EventRealm extends RealmObject {
+    @Ignore
+    private LastfmApi lastfmApi;
     private String eventid;
     @PrimaryKey
     private String name;
@@ -44,8 +48,20 @@ public class EventRealm extends RealmObject {
         for (Band band :
                 eventRockGig.getBands()) {
             bandRockGigs.add(new BandRealm(band));
-            Log.d(getClass().getSimpleName(), "BAND NAME "+ bandRockGigs.get(0));
+            Log.d(getClass().getSimpleName(), "BAND NAME " + bandRockGigs.get(0));
         }
+        if (bandRockGigs.size() < 1) {
+            try {
+                Log.d(getClass().getSimpleName(), "Setting bands bandRockGigs.size() < 1" + eventRockGig.getBands().size());
+                BandLastfm bandLastfm = lastfmApi.getBandInfo(name);
+                BandRealm bandRealm = new BandRealm();
+                bandRealm.setBandImageUrl(bandLastfm.getImageUrl());
+                bandRealm.setName(name);
+            } catch (Exception e) {
+                //no band on lastfm
+            }
+        }
+
 
         //setting date
         date = toDate(eventRockGig.getDate());
@@ -147,7 +163,7 @@ public class EventRealm extends RealmObject {
 
     @Override
     public String toString() {
-        return "EventRealm{" +
+        String s = "EventRealm{" +
                 "eventid='" + eventid + '\'' +
                 ", name='" + name + '\'' +
                 ", date=" + date +
@@ -157,7 +173,13 @@ public class EventRealm extends RealmObject {
                 ", poster='" + poster + '\'' +
                 ", genres='" + genres + '\'' +
                 ", place=" + place +
-                ", bands=" + bandRockGigs +
-                '}';
+                ", bands=";
+        for (BandRealm band :
+                bandRockGigs) {
+            s = s + "! " + band.toString() + " !";
+        }
+
+        s += '}';
+        return s;
     }
 }

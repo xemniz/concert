@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import io.realm.Realm;
 import io.realm.RealmObject;
 import ru.xmn.concert.R;
+import ru.xmn.concert.model.api.LastfmApi;
 import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.BandRealm;
 import ru.xmn.concert.model.data.EventGig;
@@ -33,14 +34,15 @@ import rx.schedulers.Schedulers;
  */
 
 public class EventsRealmAdapter extends RecyclerView.Adapter<EventsRealmAdapter.ViewHolder> {
-    private List<EventRealm> gigs = new ArrayList<>();
+    private List<String> gigs = new ArrayList<>();
     private Context context;
+    String TAG = getClass().getSimpleName();
 
     public EventsRealmAdapter(Context context) {
         this.context = context;
     }
 
-    public void setGigs(List<EventRealm> repoList) {
+    public void setGigs(List<String> repoList) {
         gigs.addAll(repoList);
         notifyDataSetChanged();
     }
@@ -56,35 +58,41 @@ public class EventsRealmAdapter extends RecyclerView.Adapter<EventsRealmAdapter.
     @Override
     public void onBindViewHolder(EventsRealmAdapter.ViewHolder viewHolder, int i) {
         viewHolder.image.setImageDrawable(null);
-        EventRealm event = gigs.get(i);
+        String eventName = gigs.get(i);
+        EventRealm event = Realm.getDefaultInstance().where(EventRealm.class).equalTo("name", eventName).findFirst();
         viewHolder.place.setText(event.getPlace().getName() + " - " + event.getName());
         viewHolder.date.setText(event.getDate() + ", " + event.getTime() + ", " + event.getPrice());
         if (event.getBandRockGigs().size() > 0) {
             BandRealm defaultBand = event.getBandRockGigs().get(0);
-            Log.d(getClass().getSimpleName(), "NAME OF DEFAULT BAND = " + defaultBand.toString());
-            if (defaultBand.getBandImageUrl().length() < 1 || defaultBand.getBandImageUrl() == null)
+            if (defaultBand.getBandImageUrl().equals(LastfmApi.DEFAULT_PIC) && event.getPoster() != null && event.getPoster().length() > 1) {
+                Log.d(TAG, "onBindViewHolder: " + event.getPoster());
                 Picasso.with(context)
-                        .load("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg")
+                        .load(event.getPoster())
                         .into(viewHolder.image);
-            else
+            } else
                 Picasso.with(context)
                         .load(defaultBand.getBandImageUrl())
                         .into(viewHolder.image);
             viewHolder.name.setText(defaultBand.getName());
         } else {
-            Picasso.with(context)
-                    .load("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg")
-                    .into(viewHolder.image);
+            if (event.getPoster() != null && event.getPoster().length() > 1) {
+                Log.d(TAG, "onBindViewHolder: " + event.getPoster());
+                Picasso.with(context)
+                        .load(event.getPoster())
+                        .into(viewHolder.image);
+            } else
+                Picasso.with(context)
+                        .load("http://blog.songcastmusic.com/wp-content/uploads/2013/08/iStock_000006170746XSmall.jpg")
+                        .into(viewHolder.image);
             viewHolder.name.setText("");
         }
 
-        Observable<BandRealm> changeView = Observable
-                .just(event.getBandRockGigs())
-                .flatMap(bands -> {
+//        Observable<BandRealm> changeView = Observable
+//                .just(event.getBandRockGigs())
+//                .flatMap(bands -> {
 //                    Collections.shuffle(bands);
-                    return Observable.from(bands);
-                });
-
+//                    return Observable.from(bands);
+//                });
 
 //        Observable.zip(
 //                changeView,
@@ -105,8 +113,7 @@ public class EventsRealmAdapter extends RecyclerView.Adapter<EventsRealmAdapter.
         return gigs.size();
     }
 
-    public void addGigs(List<EventRealm> gigs) {
-
+    public void addGigs(List<String> gigs) {
         this.gigs.addAll(gigs);
         notifyDataSetChanged();
     }
@@ -133,7 +140,7 @@ public class EventsRealmAdapter extends RecyclerView.Adapter<EventsRealmAdapter.
 
     }
 
-    public void add(EventRealm gig, int position) {
+    public void add(String gig, int position) {
         gigs.add(position, gig);
         notifyItemInserted(position);
     }

@@ -42,8 +42,8 @@ public interface BandsView extends MvpView {
     @StateStrategyType(AddToEndStrategy.class)
     void addGigs(List<EventRockGig> bands);
 
-    void setGigsRealm(List<EventRealm> bands);
+    void setGigsRealm(List<String> bands);
 
     @StateStrategyType(AddToEndStrategy.class)
-    void addGigsRealm(List<EventRealm> bands);
+    void addGigsRealm(List<String> bands);
 }

@@ -68,8 +68,10 @@ public class BandRealm extends RealmObject {
     @Override
     public String toString() {
         return "BandRealm{" +
-                "bandImageUrl='" + bandImageUrl + '\'' +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
+                ", bandgenre='" + bandgenre + '\'' +
+                ", bandvk='" + bandvk + '\'' +
+                ", bandImageUrl='" + bandImageUrl + '\'' +
                 '}';
     }
 }

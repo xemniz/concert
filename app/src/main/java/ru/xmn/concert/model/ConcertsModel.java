@@ -163,7 +163,7 @@ public class ConcertsModel {
                 .toList();
     }
 
-    public Observable<List<EventRealm>> getAllEventsRealm(int PAGE, int IT_ON_PAGE) {
+    public Observable<List<String>> getAllEventsRealm(int PAGE, int IT_ON_PAGE) {
         return Observable.create(new Observable.OnSubscribe<List<EventRealm>>() {
             @Override
             public void call(Subscriber<? super List<EventRealm>> subscriber) {
@@ -171,7 +171,7 @@ public class ConcertsModel {
                         .where(EventRealm.class)
                         .greaterThanOrEqualTo("date", new Date(System.currentTimeMillis()))
                         .findAllSorted("date");
-                Log.d(TAG, "call: realm results count "+eventRealms.size());
+                Log.d(TAG, "call: realm results count " + eventRealms.size());
                 subscriber.onNext(eventRealms);
                 subscriber.onCompleted();
             }
@@ -180,23 +180,25 @@ public class ConcertsModel {
                 .skip(IT_ON_PAGE * PAGE)
                 .take(IT_ON_PAGE)
                 .map(eventRealm -> {
-                    Log.d(getClass().getSimpleName(), "COUNT IN GETBANDSREALM "+eventRealm.getBandRockGigs().size());
+                    Log.d(getClass().getSimpleName(), "COUNT IN GETBANDSREALM " + eventRealm.getBandRockGigs().size());
                     Observable.from(eventRealm.getBandRockGigs())
                             .flatMap(bandRealm -> Observable.just(bandRealm.getName()))
                             .map(s -> {
-                                Log.d(getClass().getSimpleName(), "Thread of lastfm image getting "+ Thread.currentThread().toString());
-                                BandLastfm bandInfo = lastfmApi.getBandInfo(s);
+                                Log.d(getClass().getSimpleName(), "Thread of lastfm image getting " + Thread.currentThread().toString());
                                 Realm realm = Realm.getDefaultInstance();
-                                realm.beginTransaction();
                                 BandRealm bandRealm = realm.where(BandRealm.class).equalTo("name", s).findFirst();
-                                if (bandRealm.getBandImageUrl() == null || bandRealm.getBandImageUrl().length()<1)
+                                if (bandRealm.getBandImageUrl() == null || bandRealm.getBandImageUrl().length() < 1){
+                                    realm.beginTransaction();
+                                    BandLastfm bandInfo = lastfmApi.getBandInfo(s);
                                     bandRealm.setBandImageUrl(bandInfo.getImageUrl());
-                                realm.commitTransaction();
+                                    realm.commitTransaction();
+                                }
                                 return s;
                             })
-                    .toList().toBlocking().single();
+                            .toList().toBlocking().single();
                     return eventRealm;
                 })
+                .flatMap(eventRealm -> Observable.just(new String(eventRealm.getName())))
                 .toList()
                 .single();
     }

@@ -123,12 +123,12 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
     }
 
     @Override
-    public void setGigsRealm(List<EventRealm> bands) {
+    public void setGigsRealm(List<String> bands) {
         eventsRealmAdapter.setGigs(bands);
     }
 
     @Override
-    public void addGigsRealm(List<EventRealm> bands) {
+    public void addGigsRealm(List<String> bands) {
         eventsRealmAdapter.addGigs(bands);
     }
 }

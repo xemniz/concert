@@ -133,7 +133,7 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<EventRealm>>() {
+                .subscribe(new Observer<List<String>>() {
                     @Override
                     public void onCompleted() {
 
@@ -146,7 +146,7 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
                     }
 
                     @Override
-                    public void onNext(List<EventRealm> eventRealms) {
+                    public void onNext(List<String> eventRealms) {
                         getViewState().addGigsRealm(eventRealms);
                     }
                 });
