@@ -2,6 +2,8 @@ package ru.xmn.concert.view.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,29 +32,45 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
     private BandsEventsAdapter bandsEventsAdapter;
     private EventsBandsAdapter eventsBandsAdapter;
     private EventsRealmAdapter eventsRealmAdapter;
+    private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private AlertDialog mErrorDialog;
 
     public FragmentVk() {
     }
+
+    @Override
+    public void onCreate (Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState == null)
+        {
+
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_vk, container, false);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getContext());
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.fragment_swipe_refresh_layout);
         recyclerView.setLayoutManager(linearLayoutManager);
-        bandsEventsAdapter = new BandsEventsAdapter(this.getContext());
-        eventsBandsAdapter = new EventsBandsAdapter(this.getContext());
         eventsRealmAdapter = new EventsRealmAdapter(this.getContext());
-//        recyclerView.setAdapter(bandsEventsAdapter);
-//        recyclerView.setAdapter(eventsBandsAdapter);
-        recyclerView.setAdapter(eventsRealmAdapter);
+        presenter.setAdapter(eventsRealmAdapter);
         recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
 //                presenter.bandList(page);
-                presenter.eventList(page);
+                presenter.eventList(page, false);
             }
         });
+
+        mErrorDialog = new AlertDialog.Builder(this.getContext())
+                .setTitle(R.string.app_name)
+                .setOnCancelListener(dialog -> presenter.closeError())
+                .create();
 
         return rootView;
     }
@@ -64,63 +82,50 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
 
     @Override
     public void showError(String message) {
-
+        mErrorDialog.setMessage(message);
+        mErrorDialog.show();
     }
 
     @Override
     public void hideError() {
-
+        mErrorDialog.hide();
     }
 
     @Override
     public void onStartLoading() {
-
+        swipeRefreshLayout.setEnabled(false);
     }
 
     @Override
     public void onFinishLoading() {
-
+        swipeRefreshLayout.setEnabled(true);
     }
 
     @Override
     public void showRefreshing() {
-
+        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(true));
     }
 
     @Override
     public void hideRefreshing() {
-
+        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(false));
     }
 
     @Override
     public void showListProgress() {
-
+        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(true));
     }
 
     @Override
     public void hideListProgress() {
-
+        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(false));
     }
 
     @Override
-    public void setBands(List<Band> bands) {
-        bandsEventsAdapter.setBands(bands);
+    public void setAdapter(RecyclerView.Adapter adapter) {
+        recyclerView.setAdapter(adapter);
     }
 
-    @Override
-    public void addBands(List<Band> bands) {
-        bandsEventsAdapter.addBands(bands);
-    }
-
-    @Override
-    public void setGigs(List<EventRockGig> gigs) {
-        eventsBandsAdapter.setGigs(gigs);
-    }
-
-    @Override
-    public void addGigs(List<EventRockGig> gigs) {
-        eventsBandsAdapter.addGigs(gigs);
-    }
 
     @Override
     public void setGigsRealm(List<String> bands) {

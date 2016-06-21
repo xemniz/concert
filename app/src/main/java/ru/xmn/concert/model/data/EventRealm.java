@@ -57,6 +57,7 @@ public class EventRealm extends RealmObject {
                 BandRealm bandRealm = new BandRealm();
                 bandRealm.setBandImageUrl(bandLastfm.getImageUrl());
                 bandRealm.setName(name);
+                bandRockGigs.add(bandRealm);
             } catch (Exception e) {
                 //no band on lastfm
             }

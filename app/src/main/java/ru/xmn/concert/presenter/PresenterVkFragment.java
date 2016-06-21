@@ -1,5 +1,6 @@
 package ru.xmn.concert.presenter;
 
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.arellomobile.mvp.InjectViewState;
@@ -10,6 +11,9 @@ import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventRealm;
 import ru.xmn.concert.model.data.EventRockGig;
 import ru.xmn.concert.view.BandsView;
+import ru.xmn.concert.view.adapters.BandsEventsAdapter;
+import ru.xmn.concert.view.adapters.EventsBandsAdapter;
+import ru.xmn.concert.view.adapters.EventsRealmAdapter;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -19,116 +23,43 @@ import rx.subscriptions.Subscriptions;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by xmn on 19.05.2016.
- */
-
 @InjectViewState
 public class PresenterVkFragment extends MvpPresenter<BandsView> {
     ConcertsModel concertsModel = new ConcertsModel();
     final int PAGE_SIZE = 15;
     private Subscription subscription = Subscriptions.empty();
+    private boolean mIsInLoading;
+
 
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        eventList(0);
-        Log.d(getClass().getSimpleName(), "ONFIRSTATTACH");
-
-//        subscription = concertsModel
-//                .getBandsGigsVk(true)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .map(bands -> bands.subList(0, PAGE_SIZE))
-//                .subscribe(new Observer<List<Band>>() {
-//                    @Override
-//                    public void onCompleted() {
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        e.printStackTrace();
-//                        getViewState().showError(e.getMessage());
-//                    }
-//
-//                    @Override
-//                    public void onNext(List<Band> data) {
-//                        if (data != null && !data.isEmpty()) {
-//                            getViewState().setBands(data);
-//                        }
-//                    }
-//                });
-
+        loadGigs(false);
     }
 
-    public void bandList(int page) {
+    private void loadGigs(boolean isRefreshing) {
+        eventList(0, isRefreshing);
+    }
+
+    public void eventList(int page, boolean isRefreshing) {
+        if (mIsInLoading)
+        {
+            return;
+        }
+        mIsInLoading = true;
+
+        getViewState().hideError();
+        getViewState().onStartLoading();
+
+        showProgress();
+        
         if (!subscription.isUnsubscribed()) {
             subscription.unsubscribe();
         }
 
-        subscription = concertsModel
-                .getBandsGigsVk(false)
-                .map(bands -> {
-                    if (page * PAGE_SIZE < bands.size())
-                        if (bands.size() - page * PAGE_SIZE > PAGE_SIZE)
-                            return bands.subList(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
-                        else
-                            return bands.subList(page * PAGE_SIZE, bands.size());
-                    else
-                        return new ArrayList<Band>();
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-//                .map(bands -> bands.subList(10, 17))
-                .subscribe(new Observer<List<Band>>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                        getViewState().showError(e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(List<Band> data) {
-                        if (data != null && !data.isEmpty()) {
-                            getViewState().addBands(data);
-                        }
-                    }
-                });
-    }
-
-    public void eventList(int page) {
-        if (!subscription.isUnsubscribed()) {
-            subscription.unsubscribe();
-        }
-        subscription = concertsModel
-
-//                .getAllRockGigEvents(page+1, PAGE_SIZE)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Observer<List<EventRockGig>>() {
-//                    @Override
-//                    public void onCompleted() {
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        e.printStackTrace();
-//                        getViewState().showError(e.getMessage());
-//                    }
-//
-//                    @Override
-//                    public void onNext(List<EventRockGig> eventRockGigs) {
-//                        getViewState().addGigs(eventRockGigs);
-//                    }
-//                });
-
-                .getAllEventsRealm(page + 1, PAGE_SIZE)
+        subscription = concertsModel.getAllEventsRealm(page + 1, PAGE_SIZE)
                 .map(eventRealms -> {
-                    Log.d(getClass().getSimpleName(), "EVENTREALMS SIZE "+eventRealms.size());
+                    Log.d(getClass().getSimpleName(), "EVENTREALMS SIZE " + eventRealms.size());
                     return eventRealms;
                 })
                 .subscribeOn(Schedulers.io())
@@ -147,9 +78,34 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
 
                     @Override
                     public void onNext(List<String> eventRealms) {
-                        getViewState().addGigsRealm(eventRealms);
+                        onLoadingFinish(isRefreshing);
+                        onLoadingSuccess(eventRealms);
                     }
                 });
+    }
+
+    private void onLoadingFinish(boolean isRefreshing) {
+        mIsInLoading = false;
+
+        getViewState().onFinishLoading();
+
+        hideProgress();
+    }
+
+    private void onLoadingSuccess(List<String> eventRealms) {
+        getViewState().addGigsRealm(eventRealms);
+    }
+
+    private void hideProgress() {
+        getViewState().hideRefreshing();
+    }
+
+    private void showProgress() {
+            getViewState().showRefreshing();
+    }
+
+    public void setAdapter (RecyclerView.Adapter adapter) {
+        getViewState().setAdapter(adapter);
     }
 
     public void closeError() {

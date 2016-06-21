@@ -57,14 +57,10 @@ import rx.schedulers.Schedulers;
 public class MainActivity extends MvpAppCompatActivity implements MainView {
     @InjectPresenter
     MainPresenter presenter;
-    private static final String VK_APP_ID = "c5ciaBldtbUggy09v9m1";
     private Drawer.Result drawerResult = null;
-    private SearchView searchView;
-    private RecyclerView recyclerView;
     private AlertDialog mErrorDialog;
 
     private FragmentVk fragmentVk = new FragmentVk();
-    private FragmentVkSettings fragmentVkSettings = new FragmentVkSettings();
 
     private static final String[] sMyScope = new String[]{
             VKScope.FRIENDS,
@@ -272,8 +268,9 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     @Override
-    public void setFragment() {
-
+    public void setFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().add(R.id.content_frame, fragment).commit();
     }
 
 
@@ -282,7 +279,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
         VKCallback<VKAccessToken> callback = new VKCallback<VKAccessToken>() {
             @Override
             public void onResult(VKAccessToken res) {
-                startVkFragment();
+                presenter.setFragment(fragmentVk);
                 // User passed Authorization
             }
 
@@ -299,9 +296,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     private void startVkFragment() {
         //Start fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.content_frame, fragmentVk).commit();
-//        fragmentManager.beginTransaction().add(R.id.settings_frame, fragmentVkSettings).commit();
+        presenter.setFragment(fragmentVk);
     }
 
     private void test(){
@@ -311,14 +306,14 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
         realmApi.soutGigs();
 
         Realm realmclean = Realm.getDefaultInstance();
-//                realmclean.beginTransaction();
+//        realmclean.beginTransaction();
 //        realmclean.deleteAll();
 //        realmclean.commitTransaction();
 
 
 
-        realmApi.GigsToRealm(rockGigApi.getEventsRockGig().subscribeOn(Schedulers.io()).toBlocking().single());
-        realmApi.setImages();
+//        realmApi.GigsToRealm(rockGigApi.getEventsRockGig().subscribeOn(Schedulers.io()).toBlocking().single());
+//        realmApi.setImages();
 
 //        vkApiBridge.bandList().subscribe(strings -> {
 //            RealmQuery<EventRealm> query = RealmApi.myRealm.where(EventRealm.class);

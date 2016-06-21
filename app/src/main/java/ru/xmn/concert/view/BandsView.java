@@ -1,6 +1,9 @@
 package ru.xmn.concert.view;
 
+import android.support.v7.widget.RecyclerView;
+
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SingleStateStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
@@ -12,7 +15,7 @@ import ru.xmn.concert.model.data.EventRealm;
 import ru.xmn.concert.model.data.EventRockGig;
 
 
-@StateStrategyType(SingleStateStrategy.class)
+@StateStrategyType(AddToEndSingleStrategy.class)
 public interface BandsView extends MvpView {
     public void showData(List<Band> list);
 
@@ -32,15 +35,7 @@ public interface BandsView extends MvpView {
 
     void hideListProgress();
 
-    void setBands(List<Band> bands);
-
-    @StateStrategyType(AddToEndStrategy.class)
-    void addBands(List<Band> bands);
-
-    void setGigs(List<EventRockGig> bands);
-
-    @StateStrategyType(AddToEndStrategy.class)
-    void addGigs(List<EventRockGig> bands);
+    void setAdapter(RecyclerView.Adapter adapter);
 
     void setGigsRealm(List<String> bands);
 
