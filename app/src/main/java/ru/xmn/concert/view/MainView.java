@@ -15,7 +15,7 @@ import ru.xmn.concert.model.data.Band;
 /**
  * Created by xmn on 11.06.2016.
  */
-@StateStrategyType(AddToEndSingleStrategy.class)
+@StateStrategyType(AddToEndStrategy.class)
 public interface MainView extends MvpView{
     void showData(List<Band> list);
 
@@ -24,5 +24,5 @@ public interface MainView extends MvpView{
     void hideError();
 
     @StateStrategyType(SingleStateStrategy.class)
-    void setFragment(Fragment fragment);
+    void setFragment();
 }

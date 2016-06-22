@@ -3,7 +3,6 @@
     android:id="@+id/fragment_vk"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cardview_light_background"
     android:orientation="vertical">
 
     <!--<ScrollView-->
@@ -12,7 +11,7 @@
     <ru.xmn.concert.view.widgets.FrameSwipeRefreshLayout
         android:id="@+id/fragment_swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1">
 
         <android.support.v7.widget.RecyclerView

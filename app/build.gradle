@@ -85,4 +85,6 @@ dependencies {
     // http://mvnrepository.com/artifact/com.squareup.retrofit2/converter-scalars
     compile group: 'com.squareup.retrofit2', name: 'converter-scalars', version: '2.0.2'
     apply plugin: 'realm-android'
+    debugCompile 'com.github.lemonboston:android-investigator:1.0.0'
+
 }

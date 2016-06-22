@@ -123,6 +123,11 @@ public class EventsRealmAdapter extends RecyclerView.Adapter<EventsRealmAdapter.
         return position;
     }
 
+    public void removeAll() {
+        gigs = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView name;

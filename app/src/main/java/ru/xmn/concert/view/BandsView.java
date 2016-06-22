@@ -15,7 +15,7 @@ import ru.xmn.concert.model.data.EventRealm;
 import ru.xmn.concert.model.data.EventRockGig;
 
 
-@StateStrategyType(AddToEndSingleStrategy.class)
+@StateStrategyType(AddToEndStrategy.class)
 public interface BandsView extends MvpView {
     public void showData(List<Band> list);
 

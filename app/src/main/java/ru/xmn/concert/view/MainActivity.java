@@ -40,6 +40,7 @@ import com.vk.sdk.api.VKError;
 import java.util.List;
 
 import br.com.customsearchable.model.CustomSearchableInfo;
+import gk.android.investigator.Investigator;
 import io.realm.Realm;
 import ru.xmn.concert.R;
 import ru.xmn.concert.model.api.RealmApi;
@@ -60,8 +61,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     private Drawer.Result drawerResult = null;
     private AlertDialog mErrorDialog;
 
-    private FragmentVk fragmentVk = new FragmentVk();
-
     private static final String[] sMyScope = new String[]{
             VKScope.FRIENDS,
             VKScope.WALL,
@@ -80,7 +79,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
         //vk
         if (!VKSdk.wakeUpSession(this)) VKSdk.login(this, sMyScope);
-        else startVkFragment();
+        else presenter.setFragment();
 
         //Все для поиска
         CustomSearchableInfo.setTransparencyColor(Color.parseColor("#ccE3F2FD"));
@@ -268,9 +267,15 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
     }
 
     @Override
-    public void setFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.content_frame, fragment).commit();
+    public void setFragment() {
+//        FragmentVk fragmentVk = new FragmentVk();
+        FragmentVk fragmentVk = (FragmentVk) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+        if (fragmentVk == null) {
+            fragmentVk = FragmentVk.getInstance();
+            Investigator.log(this, "FragmentVk == null");
+            getSupportFragmentManager().beginTransaction().add(R.id.content_frame, fragmentVk).commit();
+        }
+
     }
 
 
@@ -279,7 +284,7 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
         VKCallback<VKAccessToken> callback = new VKCallback<VKAccessToken>() {
             @Override
             public void onResult(VKAccessToken res) {
-                presenter.setFragment(fragmentVk);
+                presenter.setFragment();
                 // User passed Authorization
             }
 
@@ -296,10 +301,10 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 
     private void startVkFragment() {
         //Start fragment
-        presenter.setFragment(fragmentVk);
+        presenter.setFragment();
     }
 
-    private void test(){
+    private void test() {
         RealmApi realmApi = new RealmApi();
         VkApiBridge vkApiBridge = new VkApiBridge();
         RockGigApi rockGigApi = new RockGigApi();
@@ -309,7 +314,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 //        realmclean.beginTransaction();
 //        realmclean.deleteAll();
 //        realmclean.commitTransaction();
-
 
 
 //        realmApi.GigsToRealm(rockGigApi.getEventsRockGig().subscribeOn(Schedulers.io()).toBlocking().single());
@@ -328,4 +332,5 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 //            eventRealms.asObservable().flatMap(eventRealms1 -> Observable.from(eventRealms1))
 //                    .subscribe(eventRealm -> System.out.println(eventRealm.toString()));
 //        });
-}}
+    }
+}

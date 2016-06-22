@@ -6,6 +6,7 @@ import android.util.Log;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 
+import gk.android.investigator.Investigator;
 import ru.xmn.concert.model.ConcertsModel;
 import ru.xmn.concert.model.data.Band;
 import ru.xmn.concert.model.data.EventRealm;
@@ -85,6 +86,8 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
     }
 
     private void onLoadingFinish(boolean isRefreshing) {
+        Investigator.log(this);
+
         mIsInLoading = false;
 
         getViewState().onFinishLoading();
