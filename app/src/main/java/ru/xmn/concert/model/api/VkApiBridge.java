@@ -84,7 +84,6 @@ public class VkApiBridge {
                             public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
                                 super.attemptFailed(request, attemptNumber, totalAttempts);
                                 System.out.println("attemptFailed");
-
                                 subscriber.onError(new Exception("attemptFailed"));
                             }
 
@@ -107,11 +106,12 @@ public class VkApiBridge {
                 .flatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))
                 .distinct()
                 .map(s -> s.trim().toLowerCase())
-//                .map(s -> {
-//                    System.out.println(s);
-//                    return s;
-//                })
-                .toList();
+                .map(s -> {
+                    System.out.println(s);
+                    return s;
+                })
+                .toList()
+                .single();
     }
 
     public Observable<String> setImage(String bandvk) {
@@ -128,14 +128,12 @@ public class VkApiBridge {
                                         super.onComplete(response);
                                         subscriber.onNext(response);
                                         subscriber.onCompleted();
-
                                     }
 
                                     @Override
                                     public void attemptFailed(VKRequest request, int attemptNumber, int totalAttempts) {
                                         super.attemptFailed(request, attemptNumber, totalAttempts);
                                         System.out.println("attemptFailed");
-
                                         subscriber.onError(new Exception("attemptFailed"));
                                     }
 
@@ -154,7 +152,7 @@ public class VkApiBridge {
                                 });
                     }
                 })
-                .flatMap(vkResponse -> Observable.just(( (VKList<VKApiCommunity> ) vkResponse.parsedModel)))
+                .flatMap(vkResponse -> Observable.just(((VKList<VKApiCommunity>) vkResponse.parsedModel)))
                 .flatMap(vkApiCommunities -> Observable.just(vkApiCommunities.get(0).photo_200))
                 .map(s -> {
                     System.out.println(s);
@@ -162,5 +160,4 @@ public class VkApiBridge {
                 })
                 .single();
     }
-
 }

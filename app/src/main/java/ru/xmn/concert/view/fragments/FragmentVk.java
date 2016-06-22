@@ -148,7 +148,6 @@ public class FragmentVk extends MvpAppCompatFragment implements BandsView {
 
     @Override
     public void addGigsRealm(List<String> bands) {
-
         eventsRealmAdapter.addGigs(bands);
         Investigator.log(this, "eventsRealmAdapter size", eventsRealmAdapter.getItemCount());
     }

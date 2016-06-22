@@ -58,7 +58,7 @@ public class PresenterVkFragment extends MvpPresenter<BandsView> {
             subscription.unsubscribe();
         }
 
-        subscription = concertsModel.getAllEventsRealm(page + 1, PAGE_SIZE)
+        subscription = concertsModel.getEventsRealmVk(page + 1, PAGE_SIZE)
                 .map(eventRealms -> {
                     Log.d(getClass().getSimpleName(), "EVENTREALMS SIZE " + eventRealms.size());
                     return eventRealms;

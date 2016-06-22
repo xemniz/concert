@@ -50,24 +50,26 @@ public class RealmApi {
                     Realm realm = Realm.getDefaultInstance();
                     BandRealm bRealm = realm.where(BandRealm.class).equalTo("name", s).findFirst();
                     String imageUrl = bRealm.getBandImageUrl();
-                    if (imageUrl == null || imageUrl.length() < 1 || imageUrl.equals(LastfmApi.DEFAULT_PIC)) {
-                        realm.beginTransaction();
-                        BandLastfm bandInfo = lastfmApi.getBandInfo(s);
-                        bRealm.setBandImageUrl(bandInfo.getImageUrl());
-                        realm.commitTransaction();
-                    }
+                    if (imageUrl == null || imageUrl.length() < 1) {
+                        if (imageUrl == null || imageUrl.length() < 1 || imageUrl.equals(LastfmApi.DEFAULT_PIC)) {
+                            realm.beginTransaction();
+                            BandLastfm bandInfo = lastfmApi.getBandInfo(s);
+                            bRealm.setBandImageUrl(bandInfo.getImageUrl());
+                            realm.commitTransaction();
+                        }
 
-                    if (bRealm.getBandImageUrl().equals(LastfmApi.DEFAULT_PIC)) {
-                        String bandname = new String(bRealm.getBandvk());
-                        vkApiBridge.setImage(bandname)
-                                .subscribeOn(Schedulers.from(JobExecutor.getInstance()))
-                                .subscribe(s1 -> {
-                                    Realm vkRealm = Realm.getDefaultInstance();
-                                    BandRealm vkbRealm = vkRealm.where(BandRealm.class).equalTo("name", s).findFirst();
-                                    vkRealm.beginTransaction();
-                                    vkbRealm.setBandImageUrl(s1);
-                                    vkRealm.commitTransaction();
-                                });
+                        if (bRealm.getBandImageUrl().equals(LastfmApi.DEFAULT_PIC)) {
+                            String bandname = new String(bRealm.getBandvk());
+                            vkApiBridge.setImage(bandname)
+                                    .subscribeOn(Schedulers.from(JobExecutor.getInstance()))
+                                    .subscribe(s1 -> {
+                                        Realm vkRealm = Realm.getDefaultInstance();
+                                        BandRealm vkbRealm = vkRealm.where(BandRealm.class).equalTo("name", s).findFirst();
+                                        vkRealm.beginTransaction();
+                                        vkbRealm.setBandImageUrl(s1);
+                                        vkRealm.commitTransaction();
+                                    });
+                        }
                     }
                 });
     }
