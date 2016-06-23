@@ -6,6 +6,7 @@ import com.vk.sdk.api.model.VKApiAudio;
 import com.vk.sdk.api.model.VKList;
 
 import gk.android.investigator.Investigator;
+import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -161,9 +162,12 @@ public class ConcertsModel {
     }
 
     public Observable<List<String>> getEventsRealmVk(int PAGE, int IT_ON_PAGE){
-        if (PAGE == 0){
-            vkApiBridge.bandList().subscribe(strings -> vkBandList = strings);
-            Investigator.log(this, "vkbandlist.size", vkBandList.size());
+        if (PAGE == 1){
+            new Thread(() -> {}).run();
+            vkApiBridge.bandList().toBlocking().subscribe(strings -> {
+                vkBandList = strings;
+            });
+//            Investigator.log(this, "vkbandlist.size", vkBandList.size());
         }
 
         if (vkBandList==null){
@@ -180,13 +184,13 @@ public class ConcertsModel {
             @Override
             public void call(Subscriber<? super List<EventRealm>> subscriber) {
                 RealmQuery<EventRealm> query = Realm.getDefaultInstance().where(EventRealm.class);
-                query.equalTo("name", "werynonrilnamee");
+                query.equalTo("bandRockGigs.name", "unreaaa", Case.INSENSITIVE);
                 for (String bName :
                         list) {
-                    query.or().equalTo("name", bName);
+                    query.or().equalTo("bandRockGigs.name", bName, Case.INSENSITIVE);
                 }
                 RealmResults<EventRealm> eventRealms = query
-                        .greaterThanOrEqualTo("date", new Date(System.currentTimeMillis()))
+//                        .greaterThanOrEqualTo("date", new Date(System.currentTimeMillis()))
                         .findAllSorted("date");
                 Log.d(TAG, "call: realm results count " + eventRealms.size());
                 subscriber.onNext(eventRealms);
@@ -194,8 +198,8 @@ public class ConcertsModel {
             }
         })
                 .flatMap(Observable::from)
-                .skip(IT_ON_PAGE * PAGE)
-                .take(IT_ON_PAGE)
+//                .skip(IT_ON_PAGE * PAGE)
+//                .take(IT_ON_PAGE)
                 .map(eventRealm -> {
                     Log.d(getClass().getSimpleName(), "COUNT IN GETBANDSREALM " + eventRealm.getBandRockGigs().size());
                     Observable.from(eventRealm.getBandRockGigs())

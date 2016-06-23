@@ -13,6 +13,7 @@ import com.vk.sdk.api.model.VKList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadFactory;
 
 import io.realm.internal.Group;
 import ru.xmn.concert.model.data.EventGig;
@@ -70,14 +71,13 @@ public class VkApiBridge {
                 .create(new Observable.OnSubscribe<VKResponse>() {
                     @Override
                     public void call(final Subscriber<? super VKResponse> subscriber) {
-                        VKApi.audio().get().executeWithListener(new VKRequest.VKRequestListener() {
+                        VKApi.audio().get().executeSyncWithListener(new VKRequest.VKRequestListener() {
                             @Override
                             public void onComplete(VKResponse response) {
                                 super.onComplete(response);
                                 System.out.println("INVKApIBRIDGE_INONCOMPLETE " + Thread.currentThread().getName());
                                 subscriber.onNext(response);
                                 subscriber.onCompleted();
-
                             }
 
                             @Override
@@ -102,14 +102,15 @@ public class VkApiBridge {
                         });
                     }
                 })
+                .observeOn(Schedulers.io())
                 .flatMap(vkResponse -> Observable.from((VKList<VKApiAudio>) vkResponse.parsedModel))
                 .flatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))
                 .distinct()
-                .map(s -> s.trim().toLowerCase())
-                .map(s -> {
-                    System.out.println(s);
-                    return s;
-                })
+                .map(s -> s.trim())
+//                .map(s -> {
+//                    System.out.println(s + " " + Thread.currentThread().getName());
+//                    return s;
+//                })
                 .toList()
                 .single();
     }
