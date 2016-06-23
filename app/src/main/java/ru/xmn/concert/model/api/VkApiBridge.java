@@ -64,7 +64,6 @@ public class VkApiBridge {
 //    }
 
     public Observable<List<String>> bandList() {
-        List<String> gigs = new ArrayList<>();
         System.out.println("INVKApIBRIDGE THREAD IS " + Thread.currentThread().getName());
         return Observable
                 .create(new Observable.OnSubscribe<VKResponse>() {
@@ -74,10 +73,10 @@ public class VkApiBridge {
                             @Override
                             public void onComplete(VKResponse response) {
                                 super.onComplete(response);
-                                System.out.println("INVKApIBRIDGE_INONCOMPLETE " + Thread.currentThread().getName());
+                                System.out.println("INVKApIBRIDGE_INONCOMPLETE " + Thread.currentThread().getName()+((VKList<VKApiAudio>) response.parsedModel).size());
+
                                 subscriber.onNext(response);
                                 subscriber.onCompleted();
-
                             }
 
                             @Override
@@ -85,6 +84,7 @@ public class VkApiBridge {
                                 super.attemptFailed(request, attemptNumber, totalAttempts);
                                 System.out.println("attemptFailed");
                                 subscriber.onError(new Exception("attemptFailed"));
+                                subscriber.onCompleted();
                             }
 
                             @Override
@@ -92,26 +92,27 @@ public class VkApiBridge {
                                 super.onError(error);
                                 System.out.println(error.toString());
                                 subscriber.onError(new Exception(error.toString()));
+                                subscriber.onCompleted();
                             }
 
                             @Override
                             public void onProgress(VKRequest.VKProgressType progressType, long bytesLoaded, long bytesTotal) {
                                 super.onProgress(progressType, bytesLoaded, bytesTotal);
                                 System.out.println("ONPROGRESS!");
+                                subscriber.onCompleted();
                             }
                         });
                     }
                 })
-                .flatMap(vkResponse -> Observable.from((VKList<VKApiAudio>) vkResponse.parsedModel))
-                .flatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))
+                .concatMap(vkResponse -> Observable.from((VKList<VKApiAudio>) vkResponse.parsedModel))
+                .concatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))
                 .distinct()
                 .map(s -> s.trim().toLowerCase())
                 .map(s -> {
                     System.out.println(s);
                     return s;
                 })
-                .toList()
-                .single();
+                .toList();
     }
 
     public Observable<String> setImage(String bandvk) {

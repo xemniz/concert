@@ -161,8 +161,11 @@ public class ConcertsModel {
     }
 
     public Observable<List<String>> getEventsRealmVk(int PAGE, int IT_ON_PAGE){
-        if (PAGE == 0){
-            vkApiBridge.bandList().subscribe(strings -> vkBandList = strings);
+        if (PAGE == 1){
+//            vkApiBridge.bandList().subscribe(strings -> vkBandList = strings);
+//            vkApiBridge.bandList().subscribeOn(Schedulers.io()).single().toBlocking().forEach(strings -> vkBandList = strings);
+//            vkBandList = vkApiBridge.bandList().subscribeOn(Schedulers.io()).toBlocking().subscribe(strings -> vkBandList = strings);
+            vkApiBridge.bandList().subscribeOn(Schedulers.io()).toBlocking().subscribe(strings -> vkBandList = strings);
             Investigator.log(this, "vkbandlist.size", vkBandList.size());
         }
 
