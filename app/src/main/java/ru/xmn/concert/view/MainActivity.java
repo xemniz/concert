@@ -316,8 +316,8 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
 //        realmclean.commitTransaction();
 
 
-//        realmApi.GigsToRealm(rockGigApi.getEventsRockGig().subscribeOn(Schedulers.io()).toBlocking().single());
-//        realmApi.setImages();
+        realmApi.GigsToRealm(rockGigApi.getEventsRockGig().subscribeOn(Schedulers.io()).toBlocking().single());
+        realmApi.setImages();
 
 //        vkApiBridge.bandList().subscribe(strings -> {
 //            RealmQuery<EventRealm> query = RealmApi.myRealm.where(EventRealm.class);

@@ -198,8 +198,8 @@ public class ConcertsModel {
             }
         })
                 .flatMap(Observable::from)
-//                .skip(IT_ON_PAGE * PAGE)
-//                .take(IT_ON_PAGE)
+                .skip(IT_ON_PAGE * (PAGE-1))
+                .take(IT_ON_PAGE)
                 .map(eventRealm -> {
                     Log.d(getClass().getSimpleName(), "COUNT IN GETBANDSREALM " + eventRealm.getBandRockGigs().size());
                     Observable.from(eventRealm.getBandRockGigs())
