@@ -77,10 +77,6 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //vk
-        if (!VKSdk.wakeUpSession(this)) VKSdk.login(this, sMyScope);
-        else presenter.setFragment();
-
         //Все для поиска
         CustomSearchableInfo.setTransparencyColor(Color.parseColor("#ccE3F2FD"));
 
@@ -180,6 +176,11 @@ public class MainActivity extends MvpAppCompatActivity implements MainView {
                     }
                 })
                 .build();
+
+        //vk
+        if (!VKSdk.wakeUpSession(this)) VKSdk.login(this, sMyScope);
+        else presenter.setFragment();
+
         test();
     }
 

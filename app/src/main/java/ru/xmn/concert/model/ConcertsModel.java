@@ -84,54 +84,7 @@ public class ConcertsModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-
-    public Observable<List<Band>> getBandsGigsVk(boolean isRefreshing) {
-        System.out.println("INCONCERTSMODEL " + Thread.currentThread().getName() + " gigsVkRockgig " + gigsVkRockgig.size());
-        List<Band> tmpGigsVkRockGig = new ArrayList<>();
-        tmpGigsVkRockGig.addAll(gigsVkRockgig);
-        if (isRefreshing) {
-            gigsVkRockgig = new ArrayList<Band>() {
-            };
-            return Observable
-                    .zip(vkApiBridge.bandList(), rockGigApi.getEventsRockGig(), (strings, rockGigEvents) -> {
-                        System.out.println("CONCMODEL COMBLATEST " + rockGigEvents.size());
-                        for (EventRockGig event : rockGigEvents) {
-                            for (Band band : event.getBands()) {
-                                if (strings.contains(band.getBand().trim().toLowerCase())) {
-
-                                    boolean isBandInList = false;
-                                    for (Band bandInList :
-                                            gigsVkRockgig) {
-                                        if (bandInList.equals(band)) {
-                                            bandInList.getGigs().add(event);
-                                            isBandInList = true;
-                                        }
-                                    }
-                                    if (!isBandInList) {
-                                        band.getGigs().add(event);
-                                        gigsVkRockgig.add(band);
-                                    }
-
-                                    try {
-                                        System.out.println("CONCERTMODEL THREAD IS " + Thread.currentThread().getName());
-                                        lastfmApi.getBandInfoObs(band.getBand())
-                                                .subscribe(bandLastfm -> band.setBandImageUrl(bandLastfm.getImageUrl()));
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-                        System.out.println("CONCERTMODEL BEFORERETURN " + gigsVkRockgig.size());
-                        return gigsVkRockgig;
-                    }).observeOn(Schedulers.io());
-        } else {
-            return Observable.just(tmpGigsVkRockGig);
-        }
-
-    }
-
-
+    //Получить все события постранично
     public Observable<List<String>> getAllEventsRealm(int PAGE, int IT_ON_PAGE) {
         return Observable.create(new Observable.OnSubscribe<List<EventRealm>>() {
             @Override
@@ -161,6 +114,7 @@ public class ConcertsModel {
                 .single();
     }
 
+    //Получить события исполнителей из списка вк постранично
     public Observable<List<String>> getEventsRealmVk(int PAGE, int IT_ON_PAGE){
         if (PAGE == 1){
             new Thread(() -> {}).run();
@@ -179,6 +133,7 @@ public class ConcertsModel {
         return getEventRealmFromList(PAGE, IT_ON_PAGE, vkBandList);
     }
 
+    //Получить события из любого листа
     public Observable<List<String>> getEventRealmFromList(int PAGE, int IT_ON_PAGE, List<String> list) {
         return Observable.create(new Observable.OnSubscribe<List<EventRealm>>() {
             @Override
@@ -213,12 +168,13 @@ public class ConcertsModel {
                 .single();
     }
 
-    private String loadImagesToRealm (String s ) {
+    //Загрузка фото для исполнителя
+    private String loadImagesToRealm (String bandName ) {
         Realm realm = Realm.getDefaultInstance();
-        BandRealm bandRealm = realm.where(BandRealm.class).equalTo("name", s).findFirst();
+        BandRealm bandRealm = realm.where(BandRealm.class).equalTo("name", bandName).findFirst();
         if (bandRealm.getBandImageUrl() == null || bandRealm.getBandImageUrl().length() < 1) {
             realm.beginTransaction();
-            BandLastfm bandInfo = lastfmApi.getBandInfo(s);
+            BandLastfm bandInfo = lastfmApi.getBandInfo(bandName);
             bandRealm.setBandImageUrl(bandInfo.getImageUrl());
             realm.commitTransaction();
         }
@@ -229,12 +185,12 @@ public class ConcertsModel {
                     .subscribeOn(Schedulers.from(JobExecutor.getInstance()))
                     .subscribe(s1 -> {
                         Realm vkRealm = Realm.getDefaultInstance();
-                        BandRealm vkbRealm = vkRealm.where(BandRealm.class).equalTo("name", s).findFirst();
+                        BandRealm vkbRealm = vkRealm.where(BandRealm.class).equalTo("name", bandName).findFirst();
                         vkRealm.beginTransaction();
                         vkbRealm.setBandImageUrl(s1);
                         vkRealm.commitTransaction();
                     });
         }
-        return s;
+        return bandName;
     }
 }
