@@ -44,24 +44,24 @@ public class EventRealm extends RealmObject {
         genres = eventRockGig.getGenre();
 
         //setting bands
-        Log.d(getClass().getSimpleName(), "Setting bands " + eventRockGig.getBands().size());
+//        Log.d(getClass().getSimpleName(), "Setting bands " + eventRockGig.getBands().size());
         for (Band band :
                 eventRockGig.getBands()) {
             bandRockGigs.add(new BandRealm(band));
-            Log.d(getClass().getSimpleName(), "BAND NAME " + bandRockGigs.get(0));
+//            Log.d(getClass().getSimpleName(), "BAND NAME " + bandRockGigs.get(0));
         }
-        if (bandRockGigs.size() < 1) {
-            try {
-                Log.d(getClass().getSimpleName(), "Setting bands bandRockGigs.size() < 1" + eventRockGig.getBands().size());
-                BandLastfm bandLastfm = lastfmApi.getBandInfo(name);
-                BandRealm bandRealm = new BandRealm();
-                bandRealm.setBandImageUrl(bandLastfm.getImageUrl());
-                bandRealm.setName(name);
-                bandRockGigs.add(bandRealm);
-            } catch (Exception e) {
-                //no band on lastfm
-            }
-        }
+//        if (bandRockGigs.size() < 1) {
+//            try {
+////                Log.d(getClass().getSimpleName(), "Setting bands bandRockGigs.size() < 1" + eventRockGig.getBands().size());
+//                BandLastfm bandLastfm = lastfmApi.getBandInfo(name);
+//                BandRealm bandRealm = new BandRealm();
+//                bandRealm.setBandImageUrl(bandLastfm.getImageUrl());
+//                bandRealm.setName(name);
+//                bandRockGigs.add(bandRealm);
+//            } catch (Exception e) {
+//                //no band on lastfm
+//            }
+//        }
 
 
         //setting date
@@ -154,7 +154,7 @@ public class EventRealm extends RealmObject {
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
             date = formatter.parse(dateString);
-            Log.e("Print result: ", String.valueOf(date));
+//            Log.e("Print result: ", String.valueOf(date));
 
         } catch (ParseException e1) {
             e1.printStackTrace();

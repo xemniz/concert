@@ -26,6 +26,7 @@ import rx.Observer;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -34,12 +35,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ConcertsModel {
+public enum ConcertsModel {
+    I;
     String TAG = getClass().getSimpleName();
     RockGigApi rockGigApi = new RockGigApi();
     LastfmApi lastfmApi = new LastfmApi();
     List<Band> gigsVkRockgig = new ArrayList<>();
     VkApiBridge vkApiBridge = new VkApiBridge();
+    RealmApi mRealmApi = new RealmApi();
+    private Realm mRealm = RealmApi.myRealm;
     private List<String> vkBandList;
 
     public Observable eventList(final String band) {
@@ -72,10 +76,8 @@ public class ConcertsModel {
                         }
                     }
                 })
-
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                ;
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable getArtistInfo(final String band) throws IOException {
@@ -91,7 +93,7 @@ public class ConcertsModel {
             public void call(Subscriber<? super List<EventRealm>> subscriber) {
                 RealmResults<EventRealm> eventRealms = Realm.getDefaultInstance()
                         .where(EventRealm.class)
-                        .greaterThanOrEqualTo("date", new Date(System.currentTimeMillis()))
+//                        .greaterThanOrEqualTo("date", new Date(System.currentTimeMillis()))
                         .findAllSorted("date");
                 Log.d(TAG, "call: realm results count " + eventRealms.size());
                 subscriber.onNext(eventRealms);
@@ -101,15 +103,20 @@ public class ConcertsModel {
                 .flatMap(Observable::from)
                 .skip(IT_ON_PAGE * PAGE)
                 .take(IT_ON_PAGE)
-                .map(eventRealm -> {
-                    Log.d(getClass().getSimpleName(), "COUNT IN GETBANDSREALM " + eventRealm.getBandRockGigs().size());
-                    Observable.from(eventRealm.getBandRockGigs())
-                            .flatMap(bandRealm -> Observable.just(bandRealm.getName()))
-                            .map(this::loadImagesToRealm)
-                            .toList().toBlocking().single();
-                    return eventRealm;
-                })
                 .flatMap(eventRealm -> Observable.just(new String(eventRealm.getName())))
+                .toList()
+                .single();
+    }
+
+    public Observable<List<EventRealm>> getAllEventsRealmAsync(int PAGE, int IT_ON_PAGE) {
+        return Realm.getDefaultInstance()
+                .where(EventRealm.class)
+                .findAllSorted("date")
+                .asObservable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap(Observable::from)
+                .skip(IT_ON_PAGE * PAGE)
+                .take(IT_ON_PAGE)
                 .toList()
                 .single();
     }
@@ -121,12 +128,10 @@ public class ConcertsModel {
             vkApiBridge.bandList().toBlocking().subscribe(strings -> {
                 vkBandList = strings;
             });
-//            Investigator.log(this, "vkbandlist.size", vkBandList.size());
         }
 
         if (vkBandList==null){
             vkBandList = new ArrayList<>();
-            Investigator.log(this, "if vkbandlist null", vkBandList.size());
         }
 
         Investigator.log(this, "return vkbandlist", vkBandList.size());
@@ -147,23 +152,18 @@ public class ConcertsModel {
                 RealmResults<EventRealm> eventRealms = query
 //                        .greaterThanOrEqualTo("date", new Date(System.currentTimeMillis()))
                         .findAllSorted("date");
-                Log.d(TAG, "call: realm results count " + eventRealms.size());
                 subscriber.onNext(eventRealms);
                 subscriber.onCompleted();
             }
         })
                 .flatMap(Observable::from)
-                .skip(IT_ON_PAGE * (PAGE-1))
+                .skip(IT_ON_PAGE * (PAGE))
                 .take(IT_ON_PAGE)
                 .map(eventRealm -> {
                     Log.d(getClass().getSimpleName(), "COUNT IN GETBANDSREALM " + eventRealm.getBandRockGigs().size());
-                    Observable.from(eventRealm.getBandRockGigs())
-                            .flatMap(bandRealm -> Observable.just(bandRealm.getName()))
-                            .map(this::loadImagesToRealm)
-                            .toList().toBlocking().single();
                     return eventRealm;
                 })
-                .flatMap(eventRealm -> Observable.just(new String(eventRealm.getName())))
+                .flatMap(eventRealm -> Observable.just(eventRealm.getName()))
                 .toList()
                 .single();
     }
@@ -180,7 +180,7 @@ public class ConcertsModel {
         }
 
         if (bandRealm.getBandImageUrl().equals(LastfmApi.DEFAULT_PIC)) {
-            String bandname = new String(bandRealm.getBandvk());
+            String bandname = bandRealm.getBandvk();
             vkApiBridge.setImage(bandname)
                     .subscribeOn(Schedulers.from(JobExecutor.getInstance()))
                     .subscribe(s1 -> {
@@ -192,5 +192,10 @@ public class ConcertsModel {
                     });
         }
         return bandName;
+    }
+
+    //Загрузка событий в базу
+    public Observable<Boolean> gigsToRealm () {
+        return rockGigApi.eventRgToRealm();
     }
 }

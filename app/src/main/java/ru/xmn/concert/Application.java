@@ -9,7 +9,8 @@ import com.vk.sdk.VKSdk;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-import ru.xmn.concert.view.MainActivity;
+import ru.xmn.concert.model.ConcertsModel;
+//import ru.xmn.concert.view.MainActivity;
 
 public class Application extends android.app.Application {
 
@@ -19,29 +20,37 @@ public class Application extends android.app.Application {
         return instance;
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        instance = this;
+        vkInit();
+        realmInit();
+    }
+
     VKAccessTokenTracker vkAccessTokenTracker = new VKAccessTokenTracker() {
         @Override
         public void onVKAccessTokenChanged(VKAccessToken oldToken, VKAccessToken newToken) {
             if (newToken == null) {
                 Toast.makeText(Application.this, "AccessToken invalidated", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Application.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+//                Intent intent = new Intent(Application.this, MainActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                startActivity(intent);
             }
         }
     };
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        instance = this;
-        vkAccessTokenTracker.startTracking();
-        VKSdk.initialize(this);
+    private void realmInit() {
         Realm.setDefaultConfiguration(
                 new RealmConfiguration.Builder(Application.get().getApplicationContext())
                         .deleteRealmIfMigrationNeeded()
                         .name("myOtherRealm.realm")
                         .build()
         );
+    }
+
+    private void vkInit() {
+        vkAccessTokenTracker.startTracking();
+        VKSdk.initialize(this);
     }
 }

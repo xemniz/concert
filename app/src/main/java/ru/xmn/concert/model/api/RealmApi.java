@@ -26,7 +26,6 @@ public class RealmApi {
     final String TAG = getClass().getSimpleName();
 
     public void GigsToRealm(List<EventRockGig> gigsRockGig) {
-        Log.d(this.getClass().getSimpleName(), "Gigs to realm " + Thread.currentThread());
         Observable.from(gigsRockGig)
                 .subscribeOn(Schedulers.io())
                 .map(eventRockGig -> {
@@ -34,7 +33,8 @@ public class RealmApi {
                     realm.executeTransaction(realm1 -> realm1.copyToRealmOrUpdate(new EventRealm(eventRockGig)));
                     return eventRockGig;
                 })
-                .toList().toBlocking().single();
+                .toList()
+                .single();
     }
 
     public void setImages() {
