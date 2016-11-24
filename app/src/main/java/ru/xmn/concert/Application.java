@@ -1,6 +1,5 @@
 package ru.xmn.concert;
 
-import android.content.Intent;
 import android.widget.Toast;
 
 import com.vk.sdk.VKAccessToken;
@@ -9,8 +8,7 @@ import com.vk.sdk.VKSdk;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-import ru.xmn.concert.model.ConcertsModel;
-//import ru.xmn.concert.view.MainActivity;
+//import ru.xmn.concert.mvp.view.MainActivity;
 
 public class Application extends android.app.Application {
 

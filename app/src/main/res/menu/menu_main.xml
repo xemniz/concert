@@ -2,7 +2,8 @@
       xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <item
-        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_vk_24"
+        android:id="@+id/vk_item"
         android:orderInCategory="100"
         app:showAsAction="always"
         android:title="@string/action_settings"/>
