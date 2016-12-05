@@ -17,7 +17,7 @@ public class VkFilterItem extends GigsFilterItem implements FilterItemObservable
     }
 
     @Override
-    public Observable<List<String>> list() {
+    public Observable<String> list() {
         return mVkApiBridge.bandList();
     }
 }

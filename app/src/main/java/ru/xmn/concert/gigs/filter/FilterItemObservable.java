@@ -9,5 +9,5 @@ import rx.Observable;
  */
 
 interface FilterItemObservable {
-    Observable<List<String>> list();
+    Observable<String> list();
 }

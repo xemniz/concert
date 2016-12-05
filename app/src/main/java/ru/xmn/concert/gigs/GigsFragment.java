@@ -5,11 +5,13 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.sa90.infiniterecyclerview.InfiniteRecyclerView;
 import com.sa90.infiniterecyclerview.listener.OnLoadMoreListener;
@@ -35,6 +37,8 @@ public class GigsFragment extends Fragment implements GigsContract.View {
     //filter
     private GigsFilter mFilter;
     public static final int FILTER_VK = 1;
+    private LinearLayoutManager mLayoutManager;
+    private ProgressBar mProgressBar;
 
     public static GigsFragment newInstance() {
         Bundle args = new Bundle();
@@ -49,6 +53,7 @@ public class GigsFragment extends Fragment implements GigsContract.View {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         initRecyclerView(v);
+        mProgressBar = (ProgressBar) v.findViewById(R.id.gigs_progress);
         return v;
     }
 
@@ -57,7 +62,8 @@ public class GigsFragment extends Fragment implements GigsContract.View {
         mEventRecyclerView = (InfiniteRecyclerView) v.findViewById(R.id.recycler_view_main);
         mEventRecyclerView.setHasFixedSize(true);
         mEventRecyclerView.setAdapter(mEventAdapter);
-        mEventRecyclerView.setLayoutManager(new LinearLayoutManager(mEventRecyclerView.getContext()));
+        mLayoutManager = new LinearLayoutManager(mEventRecyclerView.getContext());
+        mEventRecyclerView.setLayoutManager(mLayoutManager);
         mEventRecyclerView.setOnLoadMoreListener(() -> new Handler().post(mPresenter::loadNextGigs));
     }
 
@@ -77,18 +83,22 @@ public class GigsFragment extends Fragment implements GigsContract.View {
     //region Contract
     @Override
     public void setLoadingIndicator(boolean active) {
-
+            mEventRecyclerView.setVisibility(active?View.GONE:View.VISIBLE);
+            mProgressBar.setVisibility(active?View.VISIBLE:View.GONE);
     }
 
     @Override
-    public void showGigs(List<Event> gigs, boolean loadMore) {
+    public void showGigs(List<Event> gigs, boolean loadMore, boolean isScrollNeeded) {
         mEventAdapter.setEvents(gigs);
         mEventRecyclerView.setShouldLoadMore(loadMore);
+        if (isScrollNeeded) {
+            mLayoutManager.scrollToPositionWithOffset(0, 0);
+        }
+        setLoadingIndicator(false);
     }
 
     @Override
     public void showNextGigs(boolean loadMore) {
-        Log.d(TAG, "showNextGigs() called with: loadMore = [" + loadMore + "]");
         int from = mEventAdapter.getCount();
         if (loadMore) {
             mEventRecyclerView.moreDataLoaded(from, 20);
@@ -104,7 +114,7 @@ public class GigsFragment extends Fragment implements GigsContract.View {
 
     @Override
     public void onSubscribed() {
-        mPresenter.loadGigs(mFilter);
+        mPresenter.loadGigs();
     }
 
     @Override

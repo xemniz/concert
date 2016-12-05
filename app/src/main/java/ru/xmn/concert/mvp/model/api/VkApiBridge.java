@@ -16,8 +16,9 @@ import rx.Observable;
 import rx.Subscriber;
 
 public class VkApiBridge {
+    private static final String TAG = "VkApiBridge";
 //@RxLogObservable(RxLogObservable.Scope.EVERYTHING)
-    public Observable<List<String>> bandList() {
+    public Observable<String> bandList() {
         return Observable
                 .create(new Observable.OnSubscribe<VKResponse>() {
                     @Override
@@ -53,9 +54,7 @@ public class VkApiBridge {
                 .flatMap(vkResponse -> Observable.from((VKList<VKApiAudio>) vkResponse.parsedModel))
                 .flatMap(vkApiAudio -> Observable.just(vkApiAudio.artist))
                 .map(String::trim)
-                .distinct()
-                .toList()
-                .single();
+                .distinct();
     }
 
     public Observable<String> setImage(String bandvk) {

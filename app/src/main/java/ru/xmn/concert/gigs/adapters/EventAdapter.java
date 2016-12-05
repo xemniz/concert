@@ -45,6 +45,7 @@ public class EventAdapter extends InfiniteAdapter<RecyclerView.ViewHolder> {
     public void setEvents(List<Event> events) {
         Log.d(TAG, "setEvents() called with: events = [" + events + "]");
         mEvents = events;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -85,8 +86,8 @@ public class EventAdapter extends InfiniteAdapter<RecyclerView.ViewHolder> {
         else {
             Event eventGig = mEvents.get(position);
             ((EventViewHolder) holder).name.setText(eventGig.getName());
-//            ((EventViewHolder) holder).date.setText(eventGig.getDate()+", "+eventGig.getTime()+", "+eventGig.getPrice());
-//            ((EventViewHolder) holder).place.setText(eventGig.getPlace().getName());
+            ((EventViewHolder) holder).date.setText(eventGig.getDate()+", "+eventGig.getTime()+", "+eventGig.getPrice());
+            ((EventViewHolder) holder).place.setText(eventGig.getPlace().getName());
         }
     }
 }

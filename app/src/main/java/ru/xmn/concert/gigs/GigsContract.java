@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import ru.xmn.concert.BasePresenter;
-import ru.xmn.concert.BaseView;
+import ru.xmn.concert.mvp.BasePresenter;
+import ru.xmn.concert.mvp.view.BaseView;
 import ru.xmn.concert.gigs.filter.GigsFilter;
 import ru.xmn.concert.mvp.model.data.Event;
 
@@ -17,7 +17,7 @@ public interface GigsContract {
     interface View extends BaseView<Presenter> {
         void setLoadingIndicator(boolean active);
 
-        void showGigs(List<Event> gigs, boolean loadMore);
+        void showGigs(List<Event> gigs, boolean loadMore, boolean isScrollNeeded);
 
         void showNextGigs(boolean loadMore);
 
@@ -27,7 +27,7 @@ public interface GigsContract {
     }
 
     interface Presenter extends BasePresenter {
-        void loadGigs(GigsFilter filter);
+        void loadGigs();
 
         void loadNextGigs();
 
@@ -35,6 +35,6 @@ public interface GigsContract {
 
         void setFilter(GigsFilter filter);
 
-        void changeFilter(int id);
+        void changeFilter(int id, boolean isApply);
     }
 }

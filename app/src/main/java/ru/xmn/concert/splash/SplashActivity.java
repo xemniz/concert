@@ -27,6 +27,13 @@ public class SplashActivity extends AppCompatActivity implements SplashContract.
         );
         mSplashPresenter.subscribe();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        finish();
+    }
+
     //endregion
 
     //region Contract

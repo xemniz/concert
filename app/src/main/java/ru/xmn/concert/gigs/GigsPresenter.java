@@ -1,10 +1,13 @@
 package ru.xmn.concert.gigs;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import ru.xmn.concert.gigs.filter.GigsFilter;
 import ru.xmn.concert.mvp.model.data.Event;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.fernandocejas.frodo.core.checks.Preconditions.checkNotNull;
@@ -14,7 +17,7 @@ import static com.fernandocejas.frodo.core.checks.Preconditions.checkNotNull;
  */
 
 public class GigsPresenter implements GigsContract.Presenter {
-
+    private static final String TAG = "GigsPresenter";
     private final GigsModel mModel;
     private final GigsContract.View mView;
     @NonNull
@@ -31,17 +34,24 @@ public class GigsPresenter implements GigsContract.Presenter {
 
     //region Contract
     @Override
-    public void loadGigs(GigsFilter filter) {
-        Subscription sub1 = mModel.loadGigs(filter)
-                .subscribe(events -> mView.showGigs(mModel.getEvents(), mModel.isLoadMore()));
+    public void loadGigs() {
+        mView.setLoadingIndicator(true);
+        Subscription sub1 = mModel.loadGigs()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(events -> mView.showGigs(mModel.getEvents(), mModel.isLoadMore(), true));
         mSubscriptions.add(sub1);
     }
 
     @Override
     public void loadNextGigs() {
-        mSubscriptions.unsubscribe();
-        mModel.loadNextGigs();
-        mView.showNextGigs(mModel.isLoadMore());
+        Log.d(TAG, "loadNextGigs() called");
+        if (mModel.isLoadMore()) {
+            mModel.loadNextGigs();
+            mView.showNextGigs(mModel.isLoadMore());
+        } else {
+            mView.showNextGigs(mModel.isLoadMore());
+        }
     }
 
     @Override
@@ -55,11 +65,16 @@ public class GigsPresenter implements GigsContract.Presenter {
     }
 
     @Override
+    public void changeFilter(int id, boolean isApply) {
+        mModel.changeFilter(id, isApply);
+    }
+
+    @Override
     public void subscribe() {
         if (mModel.getEvents() == null) {
             mView.onSubscribed();
         }
-        else mView.showGigs(mModel.getEvents(), mModel.isLoadMore());
+        else mView.showGigs(mModel.getEvents(), mModel.isLoadMore(), false);
     }
 
     @Override

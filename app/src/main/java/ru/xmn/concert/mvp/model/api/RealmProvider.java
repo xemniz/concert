@@ -2,28 +2,36 @@ package ru.xmn.concert.mvp.model.api;
 
 import android.util.Log;
 
+import com.fernandocejas.frodo.annotation.RxLogObservable;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import ru.xmn.concert.JobExecutor;
+import ru.xmn.concert.gigs.filter.GigsFilter;
 import ru.xmn.concert.mvp.model.data.BandLastfm;
 import ru.xmn.concert.mvp.model.data.BandRealm;
 import ru.xmn.concert.mvp.model.data.Event;
 import ru.xmn.concert.mvp.model.data.EventRockGig;
 import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class RealmProvider {
-    private Realm mRealm = Realm.getDefaultInstance();
+    private volatile Realm mRealm = Realm.getDefaultInstance();
     private static final String TAG = "RealmProvider";
 
-    ArrayList<Event> list = new ArrayList<Event>(){{
+    //test mock
+    ArrayList<Event> list = new ArrayList<Event>() {{
         for (int i = 0; i < 110; i++) {
             Event e = new Event();
-            e.setName(i+"");
+            e.setName(i + "");
             add(e);
         }
     }};
@@ -44,15 +52,44 @@ public class RealmProvider {
         mRealm.close();
     }
 
-    public Observable<List<Event>> getEvents() {
-//        mRealm = Realm.getDefaultInstance();
-//        return mRealm.where(Event.class).findAllAsync().asObservable()
-//                .filter(RealmResults::isLoaded)
-//                .first()
-//                .map(mRealm::copyFromRealm)
-//                .doOnNext(events -> Log.d(TAG, "getEvents() called with size " + events.size()))
-//                .doOnNext(events -> mRealm.close());
-        return Observable.just(list);
+    @RxLogObservable(RxLogObservable.Scope.EVERYTHING)
+    public synchronized Observable<List<Event>> getEvents(GigsFilter filter) {
+
+        if (filter.isDisabled()) {
+            return Observable.create(subscriber -> {
+                try {
+                    Realm localRealm1 = Realm.getDefaultInstance();
+                    List<Event> events = localRealm1.copyFromRealm(localRealm1.where(Event.class).findAll());
+                    localRealm1.close();
+                    subscriber.onNext(events);
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+                subscriber.onCompleted();
+            });
+        } else
+            return filter.getFilterList()
+                    .flatMap(list -> {
+                        Realm localRealm2 = Realm.getDefaultInstance();
+                        if (list.size() < 1)
+                            return Observable.just(new ArrayList<>());
+
+                        RealmQuery<Event> q = localRealm2.where(Event.class);
+                        listFilterQuery(list, q, "bandRockGigs.name");
+
+                        List<Event> events = localRealm2.copyFromRealm(q.findAll());
+                        localRealm2.close();
+                        return Observable.just(events);
+                    });
+
+//        return Observable.just(list);
+    }
+
+    private void listFilterQuery(List<String> list, RealmQuery<Event> q, String field) {
+        q.equalTo(field, list.get(0), Case.INSENSITIVE);
+        if (list.size() > 1)
+            for (int i = 1; i < list.size(); i++)
+                q.or().equalTo(field, list.get(i), Case.INSENSITIVE);
     }
 
     public long getEventsCount() {
@@ -61,6 +98,7 @@ public class RealmProvider {
         mRealm.close();
         return count;
     }
+
 
     //region deprecated
     LastfmApi lastfmApi = new LastfmApi();

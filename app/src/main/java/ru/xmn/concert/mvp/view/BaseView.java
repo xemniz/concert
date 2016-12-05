@@ -1,4 +1,4 @@
-package ru.xmn.concert;
+package ru.xmn.concert.mvp.view;
 
 public interface BaseView<T> {
 
