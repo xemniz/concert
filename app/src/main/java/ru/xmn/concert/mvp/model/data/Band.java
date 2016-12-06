@@ -6,9 +6,13 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Band {
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class Band extends RealmObject {
     public Band(){}
 
+    @PrimaryKey
     @SerializedName("bandid")
     @Expose
     private String bandid;
@@ -22,7 +26,6 @@ public class Band {
     @Expose
     private String bandvk;
 
-    private List<EventRockGig> gigs = new ArrayList<>();
     private String bandImageUrl;
 
     public String getBandImageUrl() {
@@ -33,13 +36,6 @@ public class Band {
         this.bandImageUrl = bandImageUrl;
     }
 
-    public List<EventRockGig> getGigs() {
-        return gigs;
-    }
-
-    public void setGigs(List<EventRockGig> gigs) {
-        this.gigs = gigs;
-    }
 
     /**
      *

@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
             VKScope.DOCS,
             VKScope.AUDIO
     };
+    private GigsFragment mGigsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,19 +42,18 @@ public class MainActivity extends AppCompatActivity {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         initToolbar();
 
-        GigsFragment gigsFragment =
-                (GigsFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (gigsFragment == null) {
+        mGigsFragment = (GigsFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (mGigsFragment == null) {
             // Create the fragment
-            gigsFragment = GigsFragment.newInstance();
+            mGigsFragment = GigsFragment.newInstance();
             ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(), gigsFragment, R.id.fragment_container);
+                    getSupportFragmentManager(), mGigsFragment, R.id.fragment_container);
         }
 
         // Create the presenter
         mGigsPresenter = new GigsPresenter(
                 GigsModel.getInstance(),
-                gigsFragment);
+                mGigsFragment);
     }
 
     @Override
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResult(VKAccessToken res) {
                 mGigsPresenter.loadGigs();
+                mGigsFragment.setLoadingIndicator(true);
             }
 
             @Override

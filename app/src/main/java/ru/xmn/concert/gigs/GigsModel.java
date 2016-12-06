@@ -2,29 +2,10 @@ package ru.xmn.concert.gigs;
 
 import android.util.Log;
 
-import io.realm.Case;
-import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
-import ru.xmn.concert.JobExecutor;
-import ru.xmn.concert.gigs.filter.GigsFilter;
 import ru.xmn.concert.mvp.model.DataManager;
-import ru.xmn.concert.mvp.model.api.LastfmApi;
-import ru.xmn.concert.mvp.model.api.RealmProvider;
-import ru.xmn.concert.mvp.model.api.RockGigProvider;
-import ru.xmn.concert.mvp.model.api.VkApiBridge;
-import ru.xmn.concert.mvp.model.data.Band;
-import ru.xmn.concert.mvp.model.data.BandLastfm;
-import ru.xmn.concert.mvp.model.data.BandRealm;
 import ru.xmn.concert.mvp.model.data.Event;
-import ru.xmn.concert.mvp.model.data.EventGig;
 import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subjects.BehaviorSubject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

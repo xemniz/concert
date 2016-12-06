@@ -43,9 +43,6 @@ public class DataManager {
     //region Splash
     public Observable<List<Event>> loadGigsToRealm() {
         return mRockGigProvider.getEventsRockGig()
-                .flatMap(Observable::from)
-                .flatMap(eventRockGig -> Observable.just(new Event(eventRockGig)))
-                .toList()
                 .doOnNext(this::toRealmIfNeeded);
     }
 
