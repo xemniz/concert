@@ -3,6 +3,7 @@ package ru.xmn.concert.gigs;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import io.realm.Realm;
 import ru.xmn.concert.gigs.filter.GigsFilter;
 import ru.xmn.concert.mvp.model.data.Event;
 import rx.Subscription;
@@ -16,15 +17,16 @@ import static com.fernandocejas.frodo.core.checks.Preconditions.checkNotNull;
  * Created by xmn on 18.11.2016.
  */
 
-public class GigsPresenter implements GigsContract.Presenter {
+class GigsPresenter implements GigsContract.Presenter {
     private static final String TAG = "GigsPresenter";
     private final GigsModel mModel;
     private final GigsContract.View mView;
     @NonNull
     private CompositeSubscription mSubscriptions;
+    private Realm mRealmMain;
 
-    public GigsPresenter(@NonNull GigsModel model,
-                         @NonNull GigsContract.View view) {
+    GigsPresenter(@NonNull GigsModel model,
+                  @NonNull GigsContract.View view) {
         mModel = checkNotNull(model, "GigsRepository cannot be null");
         mView = checkNotNull(view, "GigsView cannot be null!");
 
@@ -36,22 +38,11 @@ public class GigsPresenter implements GigsContract.Presenter {
     @Override
     public void loadGigs() {
         mView.setLoadingIndicator(true);
-        Subscription sub1 = mModel.loadGigs()
-                .subscribeOn(Schedulers.computation())
+        createRealm();
+        Subscription loadGigsSubscription = mModel.loadGigsResults(mRealmMain)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(events -> mView.showGigs(mModel.getEvents(), mModel.isLoadMore(), true));
-        mSubscriptions.add(sub1);
-    }
-
-    @Override
-    public void loadNextGigs() {
-        Log.d(TAG, "loadNextGigs() called");
-        if (mModel.isLoadMore()) {
-            mModel.loadNextGigs();
-            mView.showNextGigs(mModel.isLoadMore());
-        } else {
-            mView.showNextGigs(mModel.isLoadMore());
-        }
+                .subscribe(mView::showGigs);
+        mSubscriptions.add(loadGigsSubscription);
     }
 
     @Override
@@ -70,18 +61,30 @@ public class GigsPresenter implements GigsContract.Presenter {
     }
 
     @Override
-    public void subscribe() {
-        if (mModel.getEvents() == null) {
-            mView.onSubscribed();
+    public void viewDestroyed() {
+        if (mRealmMain!=null&&!mRealmMain.isClosed()) {
+            mRealmMain.close();
         }
-        else mView.showGigs(mModel.getEvents(), mModel.isLoadMore(), false);
+    }
+
+    @Override
+    public void subscribe() {
+        Log.d(TAG, "subscribe() called");
+        createRealm();
+        loadGigs();
     }
 
     @Override
     public void unsubscribe() {
-
+        Log.d(TAG, "unsubscribe() called");
     }
 
     //endregion
+
+    private void createRealm() {
+        if (mRealmMain==null||mRealmMain.isClosed()) {
+            mRealmMain = Realm.getDefaultInstance();
+        }
+    }
 
 }

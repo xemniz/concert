@@ -1,93 +1,64 @@
 package ru.xmn.concert.gigs.adapters;
 
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.sa90.infiniterecyclerview.InfiniteAdapter;
+import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import io.realm.RealmBasedRecyclerViewAdapter;
+import io.realm.RealmResults;
+import io.realm.RealmViewHolder;
 import ru.xmn.concert.R;
 import ru.xmn.concert.mvp.model.data.Event;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 
 
-public class EventAdapter extends InfiniteAdapter<RecyclerView.ViewHolder> {
+public class EventAdapter extends RealmBasedRecyclerViewAdapter<Event, EventAdapter.ViewHolder> {
     private static final String TAG = "EventAdapter";
-    private Context mContext;
-    private List<Event> mEvents;
 
-    public EventAdapter(Context context) {
-        mEvents = new ArrayList<>();
-        mContext = context;
+    public EventAdapter(
+            Context context,
+            RealmResults<Event> realmResults,
+            boolean automaticUpdate,
+            boolean animateResults) {
+        super(context, realmResults, automaticUpdate, animateResults);
     }
 
-    public void addEvents(List<Event> events){
-        Log.d(TAG, "addEvents() called with: events = [" + Thread.currentThread().getName() + "]");
-        Observable.just(events)
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(events1 -> {
-                    mEvents.addAll(events);
-                    notifyDataSetChanged();
-                });
 
-    }
-
-    public void setEvents(List<Event> events) {
-        Log.d(TAG, "setEvents() called with: events = [" + events + "]");
-        mEvents = events;
-        notifyDataSetChanged();
+    @Override
+    public ViewHolder onCreateRealmViewHolder(ViewGroup viewGroup, int i) {
+        View v = inflater.inflate(R.layout.item_event, viewGroup, false);
+        return new ViewHolder((FrameLayout) v);
     }
 
     @Override
-    public RecyclerView.ViewHolder getLoadingViewHolder(ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View loadingView = inflater.inflate(R.layout.list_loading_view, parent, false);
-        return new LoadingViewHolder(loadingView);
-    }
-
-    @Override
-    public int getCount() {
-        return mEvents.size();
-    }
-
-    @Override
-    public int getViewType(int position) {
-        return 1;
-    }
-
-    @Override
-    public RecyclerView.ViewHolder onCreateView(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View dummyView = inflater.inflate(R.layout.item_event, parent, false);
-        return new EventViewHolder(dummyView);
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof LoadingViewHolder) {
-            LoadingViewHolder loadingViewHolder = (LoadingViewHolder) holder;
-            ObjectAnimator animator = ObjectAnimator.ofFloat(loadingViewHolder.loadingImage, "rotation", 0, 360);
-            animator.setRepeatCount(ValueAnimator.INFINITE);
-            animator.setInterpolator(new LinearInterpolator());
-            animator.setDuration(1000);
-            animator.start();
-            return;
+    public void onBindRealmViewHolder(ViewHolder viewHolder, int i) {
+        final Event event = realmResults.get(i);
+        viewHolder.name.setText(event.getName());
+        viewHolder.date.setText(event.getDate());
+        viewHolder.place.setText(event.getPlace().getName());
+        viewHolder.image.setImageResource(android.R.color.transparent);
+        if (event.getPoster()!=null&&event.getPoster().length()>0) {
+            Picasso.with(getContext()).load(event.getPoster()).into(viewHolder.image);
         }
-        else {
-            Event eventGig = mEvents.get(position);
-            ((EventViewHolder) holder).name.setText(eventGig.getName());
-            ((EventViewHolder) holder).date.setText(eventGig.getDate()+", "+eventGig.getTime()+", "+eventGig.getPrice());
-            ((EventViewHolder) holder).place.setText(eventGig.getPlace().getName());
+    }
+
+
+    class ViewHolder extends RealmViewHolder {
+        TextView date;
+        TextView place;
+        TextView name;
+        ImageView image;
+
+        ViewHolder(FrameLayout container) {
+            super(container);
+            date = (TextView) itemView.findViewById(R.id.adapterEventInfo);
+            place = (TextView) itemView.findViewById(R.id.adapterEventName);
+            name = (TextView) itemView.findViewById(R.id.adapterBandName);
+            image = (ImageView) itemView.findViewById(R.id.adapterBandImage);
         }
     }
 }

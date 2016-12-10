@@ -31,16 +31,14 @@ public class Application extends android.app.Application {
         public void onVKAccessTokenChanged(VKAccessToken oldToken, VKAccessToken newToken) {
             if (newToken == null) {
                 Toast.makeText(Application.this, "AccessToken invalidated", Toast.LENGTH_LONG).show();
-//                Intent intent = new Intent(Application.this, MainActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                startActivity(intent);
             }
         }
     };
 
     private void realmInit() {
+        Realm.init(getApplicationContext());
         Realm.setDefaultConfiguration(
-                new RealmConfiguration.Builder(Application.get().getApplicationContext())
+                new RealmConfiguration.Builder()
                         .deleteRealmIfMigrationNeeded()
                         .name("myOtherRealm.realm")
                         .build()

@@ -1,23 +1,17 @@
 package ru.xmn.concert.gigs;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.sa90.infiniterecyclerview.InfiniteRecyclerView;
-import com.sa90.infiniterecyclerview.listener.OnLoadMoreListener;
-
-import java.util.List;
-
+import co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView;
+import io.realm.RealmResults;
 import ru.xmn.concert.R;
 import ru.xmn.concert.gigs.adapters.EventAdapter;
 import ru.xmn.concert.gigs.filter.GigsFilter;
@@ -33,12 +27,12 @@ public class GigsFragment extends Fragment implements GigsContract.View {
     private static final String TAG = "GigsFragment";
     private GigsContract.Presenter mPresenter;
     private EventAdapter mEventAdapter;
-    private InfiniteRecyclerView mEventRecyclerView;
     //filter
     private GigsFilter mFilter;
     public static final int FILTER_VK = 1;
     private LinearLayoutManager mLayoutManager;
     private ProgressBar mProgressBar;
+    private RealmRecyclerView mRealmRecyclerView;
 
     public static GigsFragment newInstance() {
         Bundle args = new Bundle();
@@ -52,19 +46,14 @@ public class GigsFragment extends Fragment implements GigsContract.View {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
-        initRecyclerView(v);
+        mRealmRecyclerView = (RealmRecyclerView) v.findViewById(R.id.recycler_view_main);
         mProgressBar = (ProgressBar) v.findViewById(R.id.gigs_progress);
         return v;
     }
 
-    private void initRecyclerView(View v) {
-        mEventAdapter = new EventAdapter(getActivity().getBaseContext());
-        mEventRecyclerView = (InfiniteRecyclerView) v.findViewById(R.id.recycler_view_main);
-        mEventRecyclerView.setHasFixedSize(true);
-        mEventRecyclerView.setAdapter(mEventAdapter);
-        mLayoutManager = new LinearLayoutManager(mEventRecyclerView.getContext());
-        mEventRecyclerView.setLayoutManager(mLayoutManager);
-        mEventRecyclerView.setOnLoadMoreListener(() -> new Handler().post(mPresenter::loadNextGigs));
+    private void initRecyclerView(RealmResults<Event> events) {
+        EventAdapter eventAdapter = new EventAdapter(getContext(), events, true, true);
+        mRealmRecyclerView.setAdapter(eventAdapter);
     }
 
     @Override
@@ -78,43 +67,31 @@ public class GigsFragment extends Fragment implements GigsContract.View {
         super.onPause();
         mPresenter.unsubscribe();
     }
+
+    @Override
+    public void onDestroyView() {
+        mPresenter.viewDestroyed();
+        super.onDestroyView();
+    }
+
     //endregion
 
     //region Contract
     @Override
     public void setLoadingIndicator(boolean active) {
-            mEventRecyclerView.setVisibility(active?View.GONE:View.VISIBLE);
-            mProgressBar.setVisibility(active?View.VISIBLE:View.GONE);
+        mRealmRecyclerView.setVisibility(active ? View.GONE : View.VISIBLE);
+        mProgressBar.setVisibility(active ? View.VISIBLE : View.GONE);
     }
 
     @Override
-    public void showGigs(List<Event> gigs, boolean loadMore, boolean isScrollNeeded) {
-        mEventAdapter.setEvents(gigs);
-        mEventRecyclerView.setShouldLoadMore(loadMore);
-        if (isScrollNeeded) {
-            mLayoutManager.scrollToPositionWithOffset(0, 0);
-        }
+    public void showGigs(RealmResults<Event> events) {
+        initRecyclerView(events);
         setLoadingIndicator(false);
-    }
-
-    @Override
-    public void showNextGigs(boolean loadMore) {
-        int from = mEventAdapter.getCount();
-        if (loadMore) {
-            mEventRecyclerView.moreDataLoaded(from, 20);
-        }
-        mEventRecyclerView.setShouldLoadMore(loadMore);
-        mEventRecyclerView.getAdapter().notifyDataSetChanged();
     }
 
     @Override
     public void showGigDetails(String gigId) {
 
-    }
-
-    @Override
-    public void onSubscribed() {
-        mPresenter.loadGigs();
     }
 
     @Override

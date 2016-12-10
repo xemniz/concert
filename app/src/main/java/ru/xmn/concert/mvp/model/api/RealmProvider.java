@@ -1,5 +1,7 @@
 package ru.xmn.concert.mvp.model.api;
 
+import android.util.Log;
+
 import com.fernandocejas.frodo.annotation.RxLogObservable;
 
 import java.util.ArrayList;
@@ -16,10 +18,11 @@ import ru.xmn.concert.mvp.model.data.BandLastfm;
 import ru.xmn.concert.mvp.model.data.Band;
 import ru.xmn.concert.mvp.model.data.Event;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class RealmProvider {
-//    private volatile Realm mRealm = Realm.getDefaultInstance();
+    //    private volatile Realm mRealm = Realm.getDefaultInstance();
     private static final String TAG = "RealmProvider";
 
     //test mock
@@ -47,7 +50,6 @@ public class RealmProvider {
         mRealm.close();
     }
 
-    @RxLogObservable(RxLogObservable.Scope.EVERYTHING)
     public synchronized Observable<List<Event>> getEvents(GigsFilter filter) {
 
         if (filter.isDisabled()) {
@@ -80,11 +82,40 @@ public class RealmProvider {
 //        return Observable.just(list);
     }
 
-    private void listFilterQuery(List<String> list, RealmQuery<Event> q, String field) {
+    public synchronized Observable<RealmResults<Event>> getQuery(GigsFilter filter, Realm realm) {
+
+        if (filter.isDisabled()) {
+            return Observable.just(realm.where(Event.class).findAll());
+        } else
+            return filter.getFilterList()
+                    .map(list -> list.toArray(new String[list.size()]) )
+                    .map(list -> {
+                        Realm localRealm = Realm.getDefaultInstance();
+                        RealmResults<Band> bands = localRealm.where(Band.class).in("band", list , Case.INSENSITIVE).findAll();
+                        String[] strings = new String[bands.size()];
+                        for (int i = 0; i < bands.size(); i++) {
+                            strings[i] = bands.get(i).getBand();
+                        }
+                        return strings;
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .flatMap(list -> Observable.just(
+                        realm.where(Event.class)
+                                .in("bands.band", list , Case.INSENSITIVE)
+                                .findAll()));
+    }
+
+    private <T extends RealmObject> RealmQuery<T> listFilterQuery(List<String> list, RealmQuery<T> q, String field) {
+        Log.d(TAG, "listFilterQuery() called with: list = [" + list + "], q = [" + q + "], field = [" + field + "]");
+        if (list.size() < 1)
+            throw new RuntimeException("Empty list");
+
         q.equalTo(field, list.get(0), Case.INSENSITIVE);
         if (list.size() > 1)
             for (int i = 1; i < list.size(); i++)
                 q.or().equalTo(field, list.get(i), Case.INSENSITIVE);
+
+        return q;
     }
 
     public long getEventsCount() {

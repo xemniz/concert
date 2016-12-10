@@ -14,9 +14,13 @@
         android:layout_centerVertical="true"
         android:id="@+id/gigs_progress"
         android:visibility="gone"/>
-    <com.sa90.infiniterecyclerview.InfiniteRecyclerView
+    <co.moonmonkeylabs.realmrecyclerview.RealmRecyclerView
         android:id="@+id/recycler_view_main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"
+        app:rrvLayoutType="LinearLayout"
+        app:rrvSwipeToDelete="true"
+        app:rrvEmptyLayoutId="@layout/event_empty_view"
+        />
 
 </RelativeLayout>

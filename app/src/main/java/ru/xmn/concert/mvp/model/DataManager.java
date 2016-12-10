@@ -4,6 +4,8 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import ru.xmn.concert.gigs.GigsFragment;
 import ru.xmn.concert.gigs.MainActivity;
 import ru.xmn.concert.gigs.filter.GigsFilter;
@@ -59,6 +61,10 @@ public class DataManager {
 
     public Observable<List<Event>> getAllEvents() {
         return mRealmProvider.getEvents(mFilter);
+    }
+
+    public Observable<RealmResults<Event>> getAllEventsRealm(Realm realm) {
+        return mRealmProvider.getQuery(mFilter, realm);
     }
 
     public void changeFilter(int id, boolean isApply) {

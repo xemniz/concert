@@ -1,50 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:orientation="vertical" android:layout_width="match_parent"
-                android:layout_height="200dp">
+                android:layout_height="400dp">
 
-    <ImageView
-        android:id="@+id/adapterBandImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/vk_grey_color"
-        android:scaleType="centerCrop"/>
+    <RelativeLayout android:layout_height="match_parent" android:layout_width="match_parent">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/trending_gradient_shape"/>
+        <ImageView
+            android:id="@+id/adapterBandImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/vk_grey_color"
+            android:scaleType="centerCrop"/>
 
-    <TextView
-        android:id="@+id/adapterEventInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="4 june, fri, 3500"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="16dp"
-        android:textColor="@color/vk_white"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/trending_gradient_shape"/>
 
-    <TextView
-        android:id="@+id/adapterEventName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Фестиваль боль"
-        android:layout_above="@id/adapterEventInfo"
-        android:layout_alignStart="@+id/adapterEventInfo"
-        android:layout_marginBottom="4dp"
-        android:textColor="@color/vk_white"
-        android:textSize="16dp"/>
+        <TextView
+            android:id="@+id/adapterEventInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4 june, fri, 3500"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:textColor="@color/vk_white"/>
 
-    <TextView
-        android:id="@+id/adapterBandName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ploho"
-        android:layout_above="@+id/adapterEventName"
-        android:layout_alignStart="@+id/adapterEventName"
-        android:textSize="32dp"
-        android:textColor="@color/vk_white"
-        android:layout_marginBottom="12dp"/>
+        <TextView
+            android:id="@+id/adapterEventName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Фестиваль боль"
+            android:layout_above="@id/adapterEventInfo"
+            android:layout_alignStart="@+id/adapterEventInfo"
+            android:layout_marginBottom="4dp"
+            android:textColor="@color/vk_white"
+            android:textSize="16dp"/>
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/adapterBandName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ploho"
+            android:layout_above="@+id/adapterEventName"
+            android:layout_alignStart="@+id/adapterEventName"
+            android:textSize="32dp"
+            android:textColor="@color/vk_white"
+            android:layout_marginBottom="12dp"/>
+    </RelativeLayout>
+
+
+</FrameLayout>
